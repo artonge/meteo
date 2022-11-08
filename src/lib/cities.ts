@@ -14,7 +14,7 @@ export async function fetchCities() {
 		return
 	}
 
-	const response = await fetch('/cities1000.json')
+	const response = await fetch('/cities.json')
 	cities = await response.json()
 }
 
