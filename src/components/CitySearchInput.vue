@@ -1,56 +1,124 @@
 <script setup lang="ts">
-import { ref, defineEmits, onMounted, watch } from 'vue'
+import { ref } from 'vue'
 import type { Ref } from 'vue'
 
-import { findCity, getCityList, type City } from '@/lib/cities'
+import { debounce } from 'debounce'
+import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css'
+
+import { searchCities, type City } from '@/lib/cities'
 
 const emits = defineEmits<{(e: 'citySelected', city: City): void}>()
 
-const cityList: Ref<string[]> = ref([])
-const citySearch = ref('')
+const foundCities: Ref<City[]> = ref([])
+function searchCity(query: string, toggleLoading: Function) {
+	toggleLoading(true)
+	// Need to wrap into a timeout as search city is synchronous.
+	// So vue won't update and the loading icon won't be displayed.
+	setTimeout(() => {
+		foundCities.value = searchCities(query)
+		console.log('Found cities:', foundCities.value)
+		toggleLoading(false)
+	})
+}
 
-onMounted(async() => {
-	cityList.value = await getCityList()
-})
+const debouncedSearchCity = debounce(searchCity, 200)
 
-watch(citySearch, (value) => {
-	const city = findCity(value)
-	if (city !== undefined) {
-		emits('citySelected', city)
-	}
-})
+function selectCity(city: City) {
+	console.log('City selected', city)
+	emits('citySelected', city)
+}
 </script>
-
 <template>
-  <label for="city-choice">
-    <input
-      v-model="citySearch"
-      list="cities"
-      id="cities-choice"
-      name="cities-choice"
-  placeholder="Search a city name. Ex: Paris"
-    />
-
-    <datalist id="cities">
-      <option
-        v-for="city in cityList"
-        :key="city"
-      >
-        {{city}}
-      </option>
-    </datalist>
-  </label>
+  <v-select
+    class="city-select"
+    :options="foundCities"
+    :filterable="false"
+    placeholder="Search a city name. Ex: Paris"
+    @search="debouncedSearchCity"
+    @option:selected="selectCity"
+    :getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`"
+  >
+    <template #no-options> Type to search a city</template>
+  </v-select>
 </template>
 <style scoped lang="scss">
-label {
-  width: 100%;
+.v-select {
+  border-color: none;
+  background-color: var(--color-ternary-background);
+  border-radius: 6px;
+  width: 50%;
 
-  input {
-    border: 1px solid gray;
-    border-radius: 8px;
+  @media only screen and (max-width: 1000px) {
+    width: 75%;
+  }
+
+  @media only screen and (max-width: 800px) {
     width: 100%;
-    height: 45px;
-    padding: 0px 12px;
+  }
+
+  :deep(.vs__search) {
+    height: 60px;
+    font-size: 24px;
+    margin-top: 6px;
+    color: var(--color-text);
+  }
+
+  :deep(.vs__selected) {
+    font-size: 24px;
+    color: var(--color-primary);
+  }
+
+  &.vs--open,
+  &.vs--loading {
+    :deep(.vs__selected) {
+      top: 50%;
+      margin-top: -16px;
+    }
+  }
+
+  :deep(.vs__actions) {
+    margin-right: 4px;
+
+    .vs__clear {
+      scale: 1.5;
+      fill: var(--color-text);
+    }
+
+    .vs__open-indicator {
+      display: none;
+      color: var(--color-text);
+    }
+
+    .vs__spinner {
+      border-top-color: var(--color-border);
+      border-right-color: var(--color-border);
+      border-bottom-color: var(--color-border);
+      border-left-color: var(--color-text);
+    }
+  }
+
+  &.vs--loading {
+    :deep(.vs__clear) {
+      display: none;
+    }
+  }
+
+  :deep(.vs__dropdown-menu) {
+    background-color: var(--color-ternary-background);
+    padding: 20px 8px;
+
+    .vs__dropdown-option {
+      font-size: 20px;
+      border-radius: 8px;
+      padding: 4px 8px;
+      border: 2px solid transparent;
+    }
+
+    .vs__dropdown-option--highlight {
+      border: 2px solid var(--color-primary);
+      background-color: var(--color-primary-transparent);
+    }
   }
 }
 </style>

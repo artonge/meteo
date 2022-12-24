@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import Chart from 'chart.js/auto'
 import type { ForecastTimeStep } from '@/lib/met'
-import { getMax, getMin } from '@/lib/utils'
+import { getMax } from '@/lib/utils'
 
 const props = defineProps<{
   forecast: ForecastTimeStep[]
@@ -21,7 +21,7 @@ async function createChart() {
 		chart.value.destroy()
 	}
 
-	const maxCloud = getMax(props.forecast, day => day.data.instant.details?.cloud_area_fraction_medium)
+	// const maxCloud = getMax(props.forecast, day => day.data.instant.details?.cloud_area_fraction_medium)
 	// const minCloud = getMin(props.forecast, day => day.data.instant.details?.cloud_area_fraction_medium)
 
 	chart.value = new Chart(canvas.value, {

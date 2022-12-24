@@ -2,8 +2,8 @@
 
 # Geonames documentation: https://download.geonames.org/export/dump/readme.txt
 
-curl --silent https://download.geonames.org/export/dump/cities500.zip > "${TMPDIR:-/tmp/}/cities500.zip"
-unzip -qo "${TMPDIR:-/tmp/}/cities500.zip" -d "${TMPDIR:-/tmp/}"
+curl --silent https://download.geonames.org/export/dump/cities1000.zip > "${TMPDIR:-/tmp/}/cities1000.zip"
+unzip -qo "${TMPDIR:-/tmp/}/cities1000.zip" -d "${TMPDIR:-/tmp/}"
 
 jq -n --compact-output --raw-input --raw-output '
 	[
@@ -17,4 +17,4 @@ jq -n --compact-output --raw-input --raw-output '
 				"countryCode": .[8],
 				"population": .[14]|tonumber
 			}
-	]' "${TMPDIR:-/tmp/}/cities500.txt" > public/cities.json
+	]' "${TMPDIR:-/tmp/}/cities1000.txt" > public/cities.json

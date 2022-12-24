@@ -13,17 +13,28 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@vueuse/gesture": "^2.0.0-beta.1",
-    "@vueuse/motion": "^2.0.0-beta.12",
+    "@types/debounce": "^1.2.1",
+    "@types/vue-select": "^3.16.2",
+    "@vueuse/components": "^9.5.0",
+    "@vueuse/core": "^9.5.0",
+    "@vueuse/gesture": "^1.0.0",
+    "@vueuse/integrations": "^9.5.0",
+    "@vueuse/motion": "^1.6.0",
+    "@vueuse/shared": "^9.5.0",
     "chart.js": "^3.9.1",
     "chartjs-adapter-date-fns": "^2.0.0",
     "date-fns": "^2.29.3",
+    "debounce": "^1.2.1",
+    "dexie": "^3.2.2",
+    "focus-trap": "^7.0.0",
+    "fuse.js": "^6.6.2",
     "isomorphic-fetch": "^3.0.0",
     "pinia": "^2.0.23",
     "sass": "^1.56.0",
     "url": "^0.11.0",
     "vue": "^3.2.41",
-    "vue-router": "^4.1.5"
+    "vue-router": "^4.1.5",
+    "vue-select": "^4.0.0-beta.6"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.4",
