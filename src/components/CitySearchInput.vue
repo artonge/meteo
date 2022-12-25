@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { Ref } from 'vue'
+import { StorageSerializers, useStorage } from '@vueuse/core'
 
 import { debounce } from 'debounce'
 import vSelect from 'vue-select'
@@ -10,8 +11,18 @@ import { searchCities, type City } from '@/lib/cities'
 
 const emits = defineEmits<{(e: 'citySelected', city: City): void}>()
 
+const selectedCity: Ref<City|null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
 const foundCities: Ref<City[]> = ref([])
+
+if (selectedCity.value !== null) {
+	emits('citySelected', selectedCity.value)
+}
+
 function searchCity(query: string, toggleLoading: Function) {
+	if (query === '') {
+		return
+	}
+
 	toggleLoading(true)
 	// Need to wrap into a timeout as search city is synchronous.
 	// So vue won't update and the loading icon won't be displayed.
@@ -24,7 +35,7 @@ function searchCity(query: string, toggleLoading: Function) {
 
 const debouncedSearchCity = debounce(searchCity, 200)
 
-function selectCity(city: City) {
+function citySelected(city: City) {
 	console.log('City selected', city)
 	emits('citySelected', city)
 }
@@ -34,9 +45,10 @@ function selectCity(city: City) {
     class="city-select"
     :options="foundCities"
     :filterable="false"
+    v-model="selectedCity"
     placeholder="Search a city name. Ex: Paris"
     @search="debouncedSearchCity"
-    @option:selected="selectCity"
+    @option:selected="citySelected"
     :getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`"
   >
     <template #no-options> Type to search a city</template>
