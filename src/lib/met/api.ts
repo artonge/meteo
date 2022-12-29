@@ -14,7 +14,7 @@
 
 import * as url from "url";
 import * as isomorphicFetch from "isomorphic-fetch";
-import { Configuration } from "./configuration";
+import type { Configuration } from "./configuration";
 
 const BASE_PATH = "https://api.met.no/weatherapi/locationforecast/2.0".replace(
     /\/+$/,
@@ -57,6 +57,7 @@ export interface FetchArgs {
  * @class BaseAPI
  */
 export class BaseAPI {
+    // @ts-ignore
     protected configuration: Configuration;
 
     constructor(
@@ -78,6 +79,7 @@ export class BaseAPI {
  * @extends {Error}
  */
 export class RequiredError extends Error {
+    // @ts-ignore
     name: "RequiredError";
     constructor(public field: string, msg?: string) {
         super(msg);
