@@ -12,11 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3.5.1
-      - name: Compile app
-        run: |
-          ./scripts/cities.sh
-          npm run build
+      - uses: actions/setup-node@v3
+      - run: ./scripts/cities.sh
+      - run: npm install
+      - run: npm run build
       - uses: actions/upload-pages-artifact@v1.0.7
         with:
           path: dist

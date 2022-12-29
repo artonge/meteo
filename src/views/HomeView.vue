@@ -19,6 +19,6 @@ const selectedCity: Ref<City|null> = ref(null)
 </template>
 <style scoped lang="scss">
 main {
-  height: calc(100vh - 60px);
+  height: calc(100vh - 80px);
 }
 </style>
