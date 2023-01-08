@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
+import 'chartjs-adapter-date-fns'
 import Chart from 'chart.js/auto'
 import type { ForecastTimeStep } from '@/lib/met'
 import { getMax, getMin } from '@/lib/utils'

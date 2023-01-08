@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, defineProps, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
+import 'chartjs-adapter-date-fns'
 import Chart from 'chart.js/auto'
 import type { ForecastTimeStep } from '@/lib/met'
 import { getMax, getMin } from '@/lib/utils'
 
 const props = defineProps<{
-  forecast: ForecastTimeStep[]
+  forecast: ForecastTimeStep[];
 }>()
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null)
@@ -21,10 +22,22 @@ async function createChart() {
 		chart.value.destroy()
 	}
 
-	const maxHumidity = getMax(props.forecast, day => day.data.instant.details?.relative_humidity)
-	const minHumidity = getMin(props.forecast, day => day.data.instant.details?.relative_humidity)
-	const maxPressure = getMax(props.forecast, day => day.data.instant.details?.air_pressure_at_sea_level)
-	const minPressure = getMin(props.forecast, day => day.data.instant.details?.air_pressure_at_sea_level)
+	const maxHumidity = getMax(
+		props.forecast,
+		(day) => day.data.instant.details?.relative_humidity,
+	)
+	const minHumidity = getMin(
+		props.forecast,
+		(day) => day.data.instant.details?.relative_humidity,
+	)
+	const maxPressure = getMax(
+		props.forecast,
+		(day) => day.data.instant.details?.air_pressure_at_sea_level,
+	)
+	const minPressure = getMin(
+		props.forecast,
+		(day) => day.data.instant.details?.air_pressure_at_sea_level,
+	)
 
 	chart.value = new Chart(canvas.value, {
 		data: {
@@ -111,8 +124,11 @@ async function createChart() {
 }
 
 onMounted(() => createChart())
-watch(() => props.forecast, () => createChart())
+watch(
+	() => props.forecast,
+	() => createChart(),
+)
 </script>
 <template>
-    <canvas ref="canvas" width="500" height="200"></canvas>
+  <canvas ref="canvas" width="500" height="200"></canvas>
 </template>

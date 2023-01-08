@@ -18,8 +18,12 @@ module.exports = {
 	rules: {
 		indent: ['error', 'tab'],
 		'no-tabs': ['error', { allowIndentationTabs: true }],
-		'space-before-function-paren': ['error', 'never'],
 		'comma-dangle': ['error', 'always-multiline'],
+		'space-before-function-paren': ['error', {
+			anonymous: 'always',
+			named: 'never',
+			asyncArrow: 'always',
+		}],
 	},
 	parserOptions: {
 		ecmaVersion: 'latest',
