@@ -64,5 +64,5 @@ onMounted(() => createChart())
 watch(() => props.forecast, () => createChart())
 </script>
 <template>
-    <canvas ref="canvas" width="500" height="200"></canvas>
+	<canvas ref="canvas" width="500" height="200"></canvas>
 </template>
