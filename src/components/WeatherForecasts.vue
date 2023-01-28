@@ -11,7 +11,7 @@ import CloudForecast from './CloudForecast.vue'
 import PressureForecast from './PressureForecast.vue'
 import WindForecast from './WindForecast.vue'
 
-const props = defineProps<{city: City}>()
+const props = defineProps<{ city: City }>()
 const forecast: Ref<METJSONForecast | null> = ref(null)
 
 watch(() => props.city, () => fetchForecast(props.city.latitude, props.city.longitude))
@@ -27,19 +27,29 @@ async function fetchForecast(latitude: number, longitude: number) {
 }
 </script>
 <template>
-	<Flicking v-if="forecast !== null" :options="{ circular: true }">
-		<div>
+	<Flicking v-if="forecast !== null" :options="{
+		align: 'prev', circular: true, bound: true, panelsPerView: 1, moveType: ['strict', { count: 1 }]
+	}">
+		<div :key="0">
 			<TemperatureForecast class="forecast" :forecast="forecast.properties.timeseries" />
 		</div>
-		<div>
+		<div :key="1">
 			<CloudForecast class="forecast" :forecast="forecast.properties.timeseries" />
 		</div>
-		<div>
+		<div :key="2">
 			<PressureForecast class="forecast" :forecast="forecast.properties.timeseries" />
 		</div>
-		<div>
+		<div :key="3">
 			<WindForecast class="forecast" :forecast="forecast.properties.timeseries" />
 		</div>
 	</Flicking>
 </template>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.flicking-viewport {
+	height: 100%;
+}
+
+.forecast {
+	width: 100% !important
+}
+</style>

@@ -7,7 +7,7 @@ import type { ForecastTimeStep } from '@/lib/met'
 import { getMax, getMin } from '@/lib/utils'
 
 const props = defineProps<{
-  forecast: ForecastTimeStep[];
+	forecast: ForecastTimeStep[];
 }>()
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null)
@@ -130,5 +130,5 @@ watch(
 )
 </script>
 <template>
-	<canvas ref="canvas" width="500" height="200"></canvas>
+	<canvas ref="canvas"></canvas>
 </template>
