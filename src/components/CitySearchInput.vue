@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import { StorageSerializers, useStorage, useGeolocation } from '@vueuse/core'
+// @ts-ignore
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiLoading, mdiCrosshairs } from '@mdi/js'
 
