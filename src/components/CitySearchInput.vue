@@ -2,8 +2,8 @@
 import { ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import { StorageSerializers, useStorage, useGeolocation } from '@vueuse/core'
-import Crosshairs from 'vue-material-design-icons/Crosshairs.vue'
-import Loading from 'vue-material-design-icons/Loading.vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiLoading, mdiCrosshairs } from '@mdi/js'
 
 import { debounce } from 'debounce'
 import vSelect from 'vue-select'
@@ -11,9 +11,9 @@ import 'vue-select/dist/vue-select.css'
 
 import { searchCities, type City } from '@/lib/cities'
 
-const emits = defineEmits<{(e: 'citySelected', city: City): void}>()
+const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
 
-const selectedCity: Ref<City|null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
+const selectedCity: Ref<City | null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
 const foundCities: Ref<City[]> = ref([])
 const loadingCurrentLocation = ref(false)
 const { coords, resume, pause, isSupported } = useGeolocation({ immediate: false })
@@ -68,20 +68,14 @@ function handleGeolocationRequest() {
 </script>
 <template>
 	<div class="location-input">
-		<v-select
-			class="city-select"
-			:options="foundCities"
-			:filterable="false"
-			v-model="selectedCity"
-			placeholder="Search a city name. Ex: Paris"
-			@search="debouncedSearchCity"
-			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`"
-		>
+		<v-select class="city-select" :options="foundCities" :filterable="false" v-model="selectedCity"
+			placeholder="Search a city name. Ex: Paris" @search="debouncedSearchCity"
+			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
 			<template #no-options> Type to search a city</template>
 		</v-select>
 		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest">
-			<Loading v-if="loadingCurrentLocation"/>
-			<Crosshairs v-else/>
+			<svg-icon v-if="loadingCurrentLocation" type="mdi" :path="mdiLoading"></svg-icon>
+			<svg-icon v-else type="mdi" :path="mdiCrosshairs"></svg-icon>
 		</button>
 	</div>
 </template>
