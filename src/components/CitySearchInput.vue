@@ -20,7 +20,11 @@ const loadingCurrentLocation = ref(false)
 const { coords, resume, pause, isSupported } = useGeolocation({ immediate: false })
 
 if (selectedCity.value !== null) {
-	emits('citySelected', selectedCity.value)
+	if (selectedCity.value.name === 'Current location') {
+		handleGeolocationRequest()
+	} else {
+		emits('citySelected', selectedCity.value)
+	}
 }
 
 function searchCity(query: string, toggleLoading: Function) {
