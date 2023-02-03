@@ -30,7 +30,7 @@ function searchCity(query: string, toggleLoading: Function) {
 
 	toggleLoading(true)
 	// Need to wrap into a timeout as search city is synchronous.
-	// So vue won't update and the loading icon won't be displayed.
+	// So vue do not render before the response and the loading icon is not displayed.
 	setTimeout(() => {
 		foundCities.value = searchCities(query)
 		console.debug('Found cities:', foundCities.value)
@@ -86,7 +86,6 @@ function handleGeolocationRequest() {
 	width: 100%;
 	background-color: var(--color-background-ternary);
 	border-radius: 6px;
-	overflow: hidden;
 
 	.v-select {
 		flex-grow: 1;
