@@ -28,7 +28,7 @@ async function fetchForecast(latitude: number, longitude: number) {
 </script>
 <template>
 	<Flicking v-if="forecast !== null" :options="{
-		align: 'prev', circular: true, bound: true, panelsPerView: 1, moveType: ['strict', { count: 1 }]
+		align: 'prev', circular: true, panelsPerView: 1, moveType: ['strict', { count: 1 }]
 	}">
 		<div :key="0">
 			<TemperatureForecast class="forecast" :forecast="forecast.properties.timeseries" />
