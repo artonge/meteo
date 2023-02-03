@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v3
       - run: ./scripts/cities.sh
       - run: npm install
-      - run: npm run dev
+      - run: npm run build-only -- --mode dev
       - uses: actions/upload-pages-artifact@v1.0.7
         with:
           path: dist
