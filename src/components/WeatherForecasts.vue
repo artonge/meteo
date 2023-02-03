@@ -23,7 +23,7 @@ async function fetchForecast(latitude: number, longitude: number) {
 	forecast.value = await DataApiFp().completeGet(
 		latitude,
 		longitude,
-	)()
+	)(fetch)
 }
 </script>
 <template>
