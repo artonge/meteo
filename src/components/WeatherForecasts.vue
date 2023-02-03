@@ -18,10 +18,10 @@ import '@egjs/vue3-flicking/dist/flicking.css'
 import { DataApiFp, METJSONForecast } from '@/lib/met'
 import type { City } from '@/lib/cities'
 
-import TemperatureForecast from './TemperatureForecast.vue'
-import CloudForecast from './CloudForecast.vue'
-import PressureForecast from './PressureForecast.vue'
-import WindForecast from './WindForecast.vue'
+import TemperatureForecast from './ForecastViews/TemperatureForecast.vue'
+import CloudForecast from './ForecastViews/CloudForecast.vue'
+import PressureForecast from './ForecastViews/PressureForecast.vue'
+import WindForecast from './ForecastViews/WindForecast.vue'
 
 const props = defineProps<{ city: City }>()
 const forecast: Ref<METJSONForecast | null> = ref(null)
@@ -43,25 +43,21 @@ async function fetchForecast(latitude: number, longitude: number) {
 		align: 'prev', circular: true, panelsPerView: 1, moveType: ['strict', { count: 1 }]
 	}">
 		<div :key="0">
-			<TemperatureForecast class="forecast" :forecast="forecast.properties.timeseries" />
+			<TemperatureForecast :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="1">
-			<CloudForecast class="forecast" :forecast="forecast.properties.timeseries" />
+			<CloudForecast :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="2">
-			<PressureForecast class="forecast" :forecast="forecast.properties.timeseries" />
+			<PressureForecast :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="3">
-			<WindForecast class="forecast" :forecast="forecast.properties.timeseries" />
+			<WindForecast :forecast="forecast.properties.timeseries" />
 		</div>
 	</Flicking>
 </template>
 <style scoped lang="scss">
 .flicking-viewport {
 	height: 100%;
-}
-
-.forecast {
-	width: 100% !important
 }
 </style>

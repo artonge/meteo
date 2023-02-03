@@ -4,7 +4,7 @@ import type { Ref } from 'vue'
 import 'chartjs-adapter-date-fns'
 import Chart from 'chart.js/auto'
 import type { ForecastTimeStep } from '@/lib/met'
-import { getMax, getMin } from '@/lib/utils'
+import { getMax } from '@/lib/utils'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[];
@@ -22,22 +22,8 @@ async function createChart() {
 		chart.value.destroy()
 	}
 
-	const maxHumidity = getMax(
-		props.forecast,
-		(day) => day.data.instant.details?.relative_humidity,
-	)
-	const minHumidity = getMin(
-		props.forecast,
-		(day) => day.data.instant.details?.relative_humidity,
-	)
-	const maxPressure = getMax(
-		props.forecast,
-		(day) => day.data.instant.details?.air_pressure_at_sea_level,
-	)
-	const minPressure = getMin(
-		props.forecast,
-		(day) => day.data.instant.details?.air_pressure_at_sea_level,
-	)
+	// const maxCloud = getMax(props.forecast, day => day.data.instant.details?.cloud_area_fraction_medium)
+	// const minCloud = getMin(props.forecast, day => day.data.instant.details?.cloud_area_fraction_medium)
 
 	chart.value = new Chart(canvas.value, {
 		data: {
@@ -45,25 +31,39 @@ async function createChart() {
 			datasets: [
 				{
 					type: 'line',
-					label: 'Humidity (%)',
+					label: 'Cloud low',
 					data: props.forecast.map(
-						(day) => day.data.instant.details?.relative_humidity || 0,
+						(day) => day.data.instant.details?.cloud_area_fraction_low || 0,
 					),
 					cubicInterpolationMode: 'monotone',
-					borderColor: 'rgba(3, 126, 243, 1)',
-					yAxisID: 'yh',
+					borderColor: 'rgba(159, 159, 163, 0.3)',
+					backgroundColor: 'rgba(159, 159, 163, 0.3)',
+					fill: 'origin',
+					yAxisID: 'yc',
 				},
 				{
 					type: 'line',
-					label: 'Pressure (hPa)',
+					label: 'Cloud medium',
 					data: props.forecast.map(
-						(day) => day.data.instant.details?.air_pressure_at_sea_level || 0,
+						(day) => day.data.instant.details?.cloud_area_fraction_medium || 0,
 					),
 					cubicInterpolationMode: 'monotone',
-					borderColor: 'rgba(253, 92, 99, 1)',
-					backgroundColor: 'rgba(253, 92, 99, 0.2)',
+					borderColor: 'rgba(159, 159, 163, 0.3)',
+					backgroundColor: 'rgba(159, 159, 163, 0.3)',
 					fill: 'origin',
-					yAxisID: 'yp',
+					yAxisID: 'yc',
+				},
+				{
+					type: 'line',
+					label: 'Cloud hight',
+					data: props.forecast.map(
+						(day) => day.data.instant.details?.cloud_area_fraction_high || 0,
+					),
+					cubicInterpolationMode: 'monotone',
+					borderColor: 'rgba(159, 159, 163, 0.3)',
+					backgroundColor: 'rgba(159, 159, 163, 0.3)',
+					fill: 'origin',
+					yAxisID: 'yc',
 				},
 				{
 					type: 'bar',
@@ -76,21 +76,19 @@ async function createChart() {
 					backgroundColor: 'rgba(0, 145, 205, 0.5)',
 					yAxisID: 'yr1',
 				},
-				{
-					type: 'line',
-					label: 'Rain over 6h (mm)',
-					data: props.forecast.map(
-						(day) => (day.data.next_6_hours?.details.precipitation_amount || 0) / 6,
-					),
-					borderColor: 'rgba(86, 160, 211, 0.3)',
-					backgroundColor: 'rgba(196, 223, 246, 0.4)',
-					cubicInterpolationMode: 'monotone',
-					fill: 'origin',
-					yAxisID: 'yr6',
-				},
+				// TODO: show in better way
+				// {
+				// 	type: 'bar',
+				// 	label: 'Rain over 6h (mm)',
+				// 	data: props.forecast.map(day => (day.data.next_6_hours?.details.precipitation_amount || 0) / 6),
+				// 	backgroundColor: 'rgba(86, 160, 211, 0.8)',
+				// 	yAxisID: 'yr6',
+				// },
 			],
 		},
 		options: {
+			responsive: true,
+			maintainAspectRatio: false,
 			scales: {
 				x: {
 					type: 'time',
@@ -98,19 +96,14 @@ async function createChart() {
 						unit: 'day',
 					},
 				},
-				yh: {
+				yc: {
+					max: 500,
 					beginAtZero: true,
-					max: maxHumidity + minHumidity,
-					min: -50,
-				},
-				yp: {
-					beginAtZero: true,
-					max: maxPressure + 50,
-					min: minPressure - 20,
+					stacked: true,
 				},
 				yr1: {
 					position: 'right',
-					max: 4,
+					max: 10,
 					beginAtZero: true,
 				},
 				yr6: {
