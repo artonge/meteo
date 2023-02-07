@@ -89,6 +89,11 @@ async function createChart() {
 		options: {
 			responsive: true,
 			maintainAspectRatio: false,
+			elements: {
+				point: {
+					pointStyle: false,
+				},
+			},
 			scales: {
 				x: {
 					type: 'time',

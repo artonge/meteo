@@ -46,6 +46,11 @@ async function createChart() {
 		options: {
 			responsive: true,
 			maintainAspectRatio: false,
+			elements: {
+				point: {
+					pointStyle: false,
+				},
+			},
 			scales: {
 				x: {
 					type: 'time',
@@ -56,7 +61,7 @@ async function createChart() {
 				y: {
 					display: false,
 					beginAtZero: true,
-					max: max + min,
+					max: max + (max - min) * 0.5,
 				},
 			},
 		},
