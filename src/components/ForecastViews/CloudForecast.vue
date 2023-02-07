@@ -97,16 +97,19 @@ async function createChart() {
 					},
 				},
 				yc: {
+					display: false,
 					max: 500,
 					beginAtZero: true,
 					stacked: true,
 				},
 				yr1: {
+					display: false,
 					position: 'right',
 					max: 10,
 					beginAtZero: true,
 				},
 				yr6: {
+					display: false,
 					position: 'right',
 					max: 4,
 					beginAtZero: true,

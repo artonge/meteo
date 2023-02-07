@@ -77,16 +77,19 @@ async function createChart() {
 					},
 				},
 				yt: {
+					display: false,
 					beginAtZero: true,
 					// TODO: set to max(data) + min(data)
 					max: max + min,
 				},
 				yr1: {
+					display: false,
 					position: 'right',
 					max: 4,
 					beginAtZero: true,
 				},
 				yr6: {
+					display: false,
 					position: 'right',
 					max: 4,
 					beginAtZero: true,

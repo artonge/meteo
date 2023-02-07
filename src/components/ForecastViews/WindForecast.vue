@@ -54,6 +54,7 @@ async function createChart() {
 					},
 				},
 				y: {
+					display: false,
 					beginAtZero: true,
 					max: max + min,
 				},

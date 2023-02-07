@@ -101,21 +101,25 @@ async function createChart() {
 					},
 				},
 				yh: {
+					display: false,
 					beginAtZero: true,
 					max: maxHumidity + minHumidity,
 					min: -50,
 				},
 				yp: {
+					display: false,
 					beginAtZero: true,
 					max: maxPressure + 50,
 					min: minPressure - 20,
 				},
 				yr1: {
+					display: false,
 					position: 'right',
 					max: 4,
 					beginAtZero: true,
 				},
 				yr6: {
+					display: false,
 					position: 'right',
 					max: 4,
 					beginAtZero: true,
