@@ -57,10 +57,10 @@ watch(coords, () => {
 	loadingCurrentLocation.value = false
 	selectedCity.value = {
 		id: -1,
-		name: 'Current location',
+		name: `${coords.value.latitude.toFixed(1)}, ${coords.value.longitude.toFixed(1)}`,
 		latitude: coords.value.latitude,
 		longitude: coords.value.longitude,
-		countryCode: `${coords.value.latitude.toFixed(3)}, ${coords.value.longitude.toFixed(3)}`,
+		countryCode: 'Current location',
 		population: 0,
 	}
 })
