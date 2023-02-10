@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import type { Ref } from 'vue'
 import { StorageSerializers, useStorage, useGeolocation } from '@vueuse/core'
 // @ts-ignore
@@ -10,10 +10,11 @@ import { debounce } from 'debounce'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
-import { searchCities, type City } from '@/lib/cities'
+import { createCitiesIndex, fetchCities, searchCities, type City } from '@/lib/cities'
 
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
 
+const initialLoading = ref(true)
 const selectedCity: Ref<City | null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
 const foundCities: Ref<City[]> = ref([])
 const loadingCurrentLocation = ref(false)
@@ -26,6 +27,12 @@ if (selectedCity.value !== null) {
 		emits('citySelected', selectedCity.value)
 	}
 }
+
+onMounted(async () => {
+	await fetchCities()
+	await createCitiesIndex()
+	initialLoading.value = false
+})
 
 function searchCity(query: string, toggleLoading: Function) {
 	if (query === '') {
@@ -85,7 +92,7 @@ function handleGeolocationRequest() {
 <template>
 	<div class="location-input">
 		<v-select class="city-select" :options="foundCities" :filterable="false" v-model="selectedCity"
-			placeholder="Search a city name. Ex: Paris" @search="debouncedSearchCity"
+			:disabled="initialLoading" placeholder="Search a city name. Ex: Paris" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
 			<template #no-options> Type to search a city</template>
 		</v-select>

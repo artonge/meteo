@@ -19,6 +19,5 @@ onMounted(async () => {
 
 </script>
 <template>
-  <RouterView v-if="!loading"/>
-  <div v-else>{{state}}</div>
+	<RouterView />
 </template>
