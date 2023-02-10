@@ -44,9 +44,20 @@ function searchCity(query: string, toggleLoading: Function) {
 
 const debouncedSearchCity = debounce(searchCity, 200)
 
-watch(selectedCity, () => {
+watch(selectedCity, (newValue, oldValue) => {
+	console.debug('City selected', selectedCity.value, newValue, oldValue, newValue === oldValue)
+
+	// The watcher is triggered twice for unknown reason. This make sure that we do not emit 'citySelected' twice
+	if (newValue !== null && oldValue !== null) {
+		const { latitude: nlat, longitude: nlon } = newValue
+		const { latitude: olat, longitude: olon } = oldValue
+
+		if (nlat === olat && nlon === olon) {
+			return
+		}
+	}
+
 	if (selectedCity.value !== null) {
-		console.debug('City selected', selectedCity.value)
 		emits('citySelected', selectedCity.value)
 	}
 })
@@ -79,7 +90,7 @@ function handleGeolocationRequest() {
 			<template #no-options> Type to search a city</template>
 		</v-select>
 		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest">
-			<svg-icon v-if="loadingCurrentLocation" type="mdi" :path="mdiLoading"></svg-icon>
+			<svg-icon v-if="loadingCurrentLocation" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			<svg-icon v-else type="mdi" :path="mdiCrosshairs"></svg-icon>
 		</button>
 	</div>
@@ -171,6 +182,10 @@ function handleGeolocationRequest() {
 	.geolocation-button {
 		width: 72px;
 		flex-shrink: 0;
+
+		.loading {
+			animation: vSelectSpinner 1.1s infinite linear;
+		}
 	}
 }
 </style>
