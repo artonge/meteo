@@ -6,19 +6,19 @@ import Header from '@/components/Header.vue'
 import CitySearchInput from '@/components/CitySearchInput.vue'
 import WeatherForecasts from '@/components/WeatherForecasts.vue'
 
-const selectedCity: Ref<City|null> = ref(null)
+const selectedCity: Ref<City | null> = ref(null)
 </script>
 <template>
   <Header>
-    <CitySearchInput @citySelected="(city) => selectedCity = city"/>
+    <CitySearchInput @citySelected="(city) => selectedCity = city" />
   </Header>
 
   <main>
-    <WeatherForecasts v-if='selectedCity !== null' :city="selectedCity"/>
+    <WeatherForecasts v-if='selectedCity !== null' :city="selectedCity" />
   </main>
 </template>
 <style scoped lang="scss">
 main {
-  height: calc(100vh - 80px);
+  height: calc(100dvh - 80px);
 }
 </style>
