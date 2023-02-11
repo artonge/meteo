@@ -61,7 +61,7 @@ async function createChart() {
 					cubicInterpolationMode: 'monotone',
 					borderColor: 'rgba(244, 137, 36, 0.8)',
 					backgroundColor: 'rgb(255, 200, 69, 0.5)',
-					fill: 'origin',
+					fill: "start",
 					yAxisID: 'yt',
 				},
 			],
