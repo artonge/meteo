@@ -6,7 +6,7 @@ import 'chartjs-adapter-date-fns'
 import { format } from 'date-fns'
 import type { ForecastTimeStep } from '@/lib/met'
 import { getMax } from '@/lib/utils'
-import { defaultChartOptions } from './commonConfig'
+import { defaultChartOptions, defaultChartPlugins } from './commonConfig'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[];
@@ -28,6 +28,7 @@ async function createChart() {
 	// const minCloud = getMin(props.forecast, day => day.data.instant.details?.cloud_area_fraction_medium)
 
 	chart.value = new Chart(canvas.value, {
+		plugins: defaultChartPlugins,
 		data: {
 			labels: props.forecast.map((day) => day.time),
 			datasets: [
@@ -97,6 +98,7 @@ async function createChart() {
 					pointStyle: false,
 				},
 			},
+			plugins: defaultChartOptions.plugins,
 			scales: {
 				...defaultChartOptions.scales,
 				yc: {

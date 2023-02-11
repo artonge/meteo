@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import type { ChartOptions, Plugin } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
+import zoomPlugin from 'chartjs-plugin-zoom'
 import 'chartjs-adapter-date-fns'
 
 export const defaultChartOptions: ChartOptions<'line'> = {
@@ -39,11 +40,33 @@ export const defaultChartOptions: ChartOptions<'line'> = {
 
 				return context.dataIndex === 0 || isLocalMax || isLocalMin
 			},
-		}
-
+		},
+		zoom: {
+			pan: {
+				mode: 'x',
+				scaleMode: 'x',
+			},
+			zoom: {
+				mode: 'x',
+				wheel: {
+					enabled: true,
+				},
+				pinch: {
+					enabled: true
+				},
+			},
+			limits: {
+				x: {
+					min: 'original',
+					max: 'original',
+					minRange: 1000 * 60 * 60 * 24 * 3,
+				}
+			}
+		},
 	}
 }
 
 export const defaultChartPlugins: Plugin<'line'>[] = [
 	ChartDataLabels,
+	zoomPlugin,
 ]
