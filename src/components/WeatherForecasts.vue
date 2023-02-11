@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// TODO: Bug from chartjs on reload when current location is restored
 // TODO: Increase snap to next panel when swiping (swiping just a little snap to the next panel)
 // TODO: Increase discoverability of other panels
 // TODO: Improve graph layout
@@ -7,10 +6,9 @@
 // TODO: Allow to zoom on the graphs
 // TODO: Begin and end graphs at the edge of the screen
 // TODO: Support other weather providers
-// TODO: Load cities in the background and display the view faster
+// TODO: Improve disabled state style of header input
+// TODO: Improve loading state style of geolocation button
 // TODO: Check what karla is doing more
-// TODO: Check rendering on mobile
-// TODO: Support white theme
 import { ref, watch, onMounted, type Ref } from 'vue'
 import Flicking from '@egjs/vue3-flicking'
 import '@egjs/vue3-flicking/dist/flicking.css'

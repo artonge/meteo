@@ -67,6 +67,7 @@ async function createChart() {
 			],
 		},
 		options: {
+			animation: false,
 			responsive: true,
 			maintainAspectRatio: false,
 			elements: {
@@ -84,7 +85,8 @@ async function createChart() {
 				yt: {
 					display: false,
 					// TODO: set to max(data) + min(data)
-					max: max + (max - min) * 0.5,
+					max: max + (max - min) * 2,
+					min: -10,
 					beginAtZero: true,
 				},
 				yr1: {

@@ -44,6 +44,7 @@ async function createChart() {
 			],
 		},
 		options: {
+			animation: false,
 			responsive: true,
 			maintainAspectRatio: false,
 			elements: {
