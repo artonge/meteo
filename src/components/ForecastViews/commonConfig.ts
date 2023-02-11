@@ -18,6 +18,7 @@ export const defaultChartOptions: ChartOptions<'line'> = {
 				color: 'gray',
 				offset: false,
 			},
+			offset: false,
 		},
 	},
 	plugins: {
