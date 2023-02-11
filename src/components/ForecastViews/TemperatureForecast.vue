@@ -86,7 +86,7 @@ async function createChart() {
 					display: false,
 					// TODO: set to max(data) + min(data)
 					max: max + (max - min) * 2,
-					min: -10,
+					min: min - (max - min) * 2,
 					beginAtZero: true,
 				},
 				yr1: {
