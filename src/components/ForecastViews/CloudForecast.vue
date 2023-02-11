@@ -6,6 +6,7 @@ import 'chartjs-adapter-date-fns'
 import { format } from 'date-fns'
 import type { ForecastTimeStep } from '@/lib/met'
 import { getMax } from '@/lib/utils'
+import { defaultChartOptions } from './commonConfig'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[];
@@ -97,15 +98,7 @@ async function createChart() {
 				},
 			},
 			scales: {
-				x: {
-					type: 'time',
-					time: {
-						unit: 'day',
-					},
-					ticks: {
-						callback: (val) => format(new Date(val), 'ccc'),
-					},
-				},
+				...defaultChartOptions.scales,
 				yc: {
 					display: false,
 					max: 500,

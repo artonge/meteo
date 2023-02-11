@@ -2,10 +2,9 @@
 import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import Chart from 'chart.js/auto'
-import 'chartjs-adapter-date-fns'
-import { format, parseISO } from 'date-fns'
 import type { ForecastTimeStep } from '@/lib/met'
 import { getMax, getMin } from '@/lib/utils'
+import { defaultChartOptions, defaultChartPlugins } from './commonConfig'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[]
@@ -27,9 +26,22 @@ async function createChart() {
 	const min = getMin(props.forecast, day => day.data.instant.details?.air_temperature)
 
 	chart.value = new Chart(canvas.value, {
+		plugins: defaultChartPlugins,
 		data: {
 			labels: props.forecast.map((day) => day.time),
 			datasets: [
+				{
+					type: 'line',
+					label: 'Temperature (°C)',
+					data: props.forecast.map(
+						(day) => day.data.instant.details?.air_temperature || 0,
+					),
+					cubicInterpolationMode: 'monotone',
+					borderColor: 'rgba(244, 137, 36, 0.8)',
+					backgroundColor: 'rgb(255, 200, 69, 0.5)',
+					fill: "start",
+					yAxisID: 'yt',
+				},
 				{
 					type: 'bar',
 					// TODO: use unit from response
@@ -53,18 +65,6 @@ async function createChart() {
 					fill: 'origin',
 					yAxisID: 'yr6',
 				},
-				{
-					type: 'line',
-					label: 'Temperature (°C)',
-					data: props.forecast.map(
-						(day) => day.data.instant.details?.air_temperature || 0,
-					),
-					cubicInterpolationMode: 'monotone',
-					borderColor: 'rgba(244, 137, 36, 0.8)',
-					backgroundColor: 'rgb(255, 200, 69, 0.5)',
-					fill: "start",
-					yAxisID: 'yt',
-				},
 			],
 		},
 		options: {
@@ -76,16 +76,9 @@ async function createChart() {
 					pointStyle: false,
 				},
 			},
+			plugins: defaultChartOptions.plugins,
 			scales: {
-				x: {
-					type: 'time',
-					time: {
-						unit: 'day',
-					},
-					ticks: {
-						callback: (val) => format(new Date(val), 'ccc'),
-					},
-				},
+				...defaultChartOptions.scales,
 				yt: {
 					display: false,
 					max: max + (max - min) * 2,
