@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
-import 'chartjs-adapter-date-fns'
 import Chart from 'chart.js/auto'
+import 'chartjs-adapter-date-fns'
+import { format, parseISO } from 'date-fns'
 import type { ForecastTimeStep } from '@/lib/met'
 import { getMax, getMin } from '@/lib/utils'
 
@@ -81,10 +82,12 @@ async function createChart() {
 					time: {
 						unit: 'day',
 					},
+					ticks: {
+						callback: (val) => format(new Date(val), 'ccc'),
+					},
 				},
 				yt: {
 					display: false,
-					// TODO: set to max(data) + min(data)
 					max: max + (max - min) * 2,
 					min: min - (max - min) * 2,
 					beginAtZero: true,
