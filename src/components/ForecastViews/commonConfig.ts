@@ -23,6 +23,9 @@ export const defaultChartOptions: ChartOptions<'line'> = {
 		},
 	},
 	plugins: {
+		tooltip: {
+			enabled: false,
+		},
 		datalabels: {
 			color: 'gray',
 			align: 'top',
