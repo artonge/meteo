@@ -1,14 +1,13 @@
 <script setup lang="ts">
 // TODO: Increase snap to next panel when swiping (swiping just a little snap to the next panel)
 // TODO: Increase discoverability of other panels
-// TODO: Improve graph layout
-// TODO: Add cursor over graphs
-// TODO: Allow to zoom on the graphs
-// TODO: Begin and end graphs at the edge of the screen
+// TODO: Allow to move around the graph when zoomed
 // TODO: Support other weather providers
 // TODO: Improve disabled state style of header input
 // TODO: Improve loading state style of geolocation button
-// TODO: Check what karla is doing more
+// TODO: Extend ticker to the bottom scale
+// TODO: Allow to move the cursor from the bottom scale
+// TODO: Increase bottom scale height
 import { ref, watch, onMounted, type Ref } from 'vue'
 import Flicking from '@egjs/vue3-flicking'
 import '@egjs/vue3-flicking/dist/flicking.css'

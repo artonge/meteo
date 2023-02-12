@@ -37,6 +37,18 @@ async function createChart() {
 			datasets: [
 				{
 					type: 'line',
+					label: 'Cloud total',
+					data: props.forecast.map(
+						(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction || 0,
+					),
+					cubicInterpolationMode: 'monotone',
+					borderColor: 'rgba(0, 0, 0, 0)',
+					backgroundColor: 'rgba(0, 0, 0, 0)',
+					fill: 'origin',
+					yAxisID: 'yct',
+				},
+				{
+					type: 'line',
 					label: 'Cloud low',
 					data: props.forecast.map(
 						(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction_low || 0,
@@ -70,6 +82,42 @@ async function createChart() {
 					backgroundColor: 'rgba(159, 159, 163, 0.3)',
 					fill: 'origin',
 					yAxisID: 'yc',
+				},
+				{
+					type: 'line',
+					label: 'Cloud low',
+					data: props.forecast.map(
+						(dataPoint) => -(dataPoint.data.instant.details?.cloud_area_fraction_low || 0),
+					),
+					cubicInterpolationMode: 'monotone',
+					borderColor: 'rgba(159, 159, 163, 0.3)',
+					backgroundColor: 'rgba(159, 159, 163, 0.3)',
+					fill: 'origin',
+					yAxisID: 'yci',
+				},
+				{
+					type: 'line',
+					label: 'Cloud medium',
+					data: props.forecast.map(
+						(dataPoint) => -(dataPoint.data.instant.details?.cloud_area_fraction_medium || 0),
+					),
+					cubicInterpolationMode: 'monotone',
+					borderColor: 'rgba(159, 159, 163, 0.3)',
+					backgroundColor: 'rgba(159, 159, 163, 0.3)',
+					fill: 'origin',
+					yAxisID: 'yci',
+				},
+				{
+					type: 'line',
+					label: 'Cloud hight',
+					data: props.forecast.map(
+						(dataPoint) => -(dataPoint.data.instant.details?.cloud_area_fraction_high || 0),
+					),
+					cubicInterpolationMode: 'monotone',
+					borderColor: 'rgba(159, 159, 163, 0.3)',
+					backgroundColor: 'rgba(159, 159, 163, 0.3)',
+					fill: 'origin',
+					yAxisID: 'yci',
 				},
 				{
 					type: 'bar',
@@ -116,9 +164,24 @@ async function createChart() {
 			},
 			scales: {
 				...defaultChartOptions.scales,
+				yct: {
+					display: false,
+					max: 600,
+					min: -600,
+					beginAtZero: true,
+					stacked: true,
+				},
 				yc: {
 					display: false,
-					max: 500,
+					max: 600,
+					min: -600,
+					beginAtZero: true,
+					stacked: true,
+				},
+				yci: {
+					display: false,
+					max: 600,
+					min: -600,
 					beginAtZero: true,
 					stacked: true,
 				},
