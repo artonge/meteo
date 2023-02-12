@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ForecastDetails from './ForecastDetails.vue';
+
 const props = defineProps<{
 	time: string,
 }>()

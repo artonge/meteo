@@ -3,10 +3,11 @@ import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import Chart from 'chart.js/auto'
 import 'chartjs-adapter-date-fns'
-import { format } from 'date-fns'
 import type { ForecastTimeStep } from '@/lib/met'
-import { getMax } from '@/lib/utils'
 import { defaultChartOptions, defaultChartPlugins } from './commonConfig'
+import ForecastLayout from './ForecastLayout.vue'
+import { formatNumber } from '@/lib/utils'
+import { isAfter } from 'date-fns'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[];
@@ -14,6 +15,8 @@ const props = defineProps<{
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 const chart: Ref<Chart | null> = ref(null)
+
+const hoveredDataPoint: Ref<ForecastTimeStep> = ref(props.forecast[0])
 
 async function createChart() {
 	if (canvas.value === null) {
@@ -24,19 +27,19 @@ async function createChart() {
 		chart.value.destroy()
 	}
 
-	// const maxCloud = getMax(props.forecast, day => day.data.instant.details?.cloud_area_fraction_medium)
-	// const minCloud = getMin(props.forecast, day => day.data.instant.details?.cloud_area_fraction_medium)
+	// const maxCloud = getMax(props.forecast, dataPoint => dataPoint.data.instant.details?.cloud_area_fraction_medium)
+	// const minCloud = getMin(props.forecast, dataPoint => dataPoint.data.instant.details?.cloud_area_fraction_medium)
 
 	chart.value = new Chart(canvas.value, {
 		plugins: defaultChartPlugins,
 		data: {
-			labels: props.forecast.map((day) => day.time),
+			labels: props.forecast.map((dataPoint) => dataPoint.time),
 			datasets: [
 				{
 					type: 'line',
 					label: 'Cloud low',
 					data: props.forecast.map(
-						(day) => day.data.instant.details?.cloud_area_fraction_low || 0,
+						(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction_low || 0,
 					),
 					cubicInterpolationMode: 'monotone',
 					borderColor: 'rgba(159, 159, 163, 0.3)',
@@ -48,7 +51,7 @@ async function createChart() {
 					type: 'line',
 					label: 'Cloud medium',
 					data: props.forecast.map(
-						(day) => day.data.instant.details?.cloud_area_fraction_medium || 0,
+						(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction_medium || 0,
 					),
 					cubicInterpolationMode: 'monotone',
 					borderColor: 'rgba(159, 159, 163, 0.3)',
@@ -60,7 +63,7 @@ async function createChart() {
 					type: 'line',
 					label: 'Cloud hight',
 					data: props.forecast.map(
-						(day) => day.data.instant.details?.cloud_area_fraction_high || 0,
+						(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction_high || 0,
 					),
 					cubicInterpolationMode: 'monotone',
 					borderColor: 'rgba(159, 159, 163, 0.3)',
@@ -73,7 +76,7 @@ async function createChart() {
 					// TODO: use unit from response
 					label: 'Accurate rain (mm)',
 					data: props.forecast.map(
-						(day) => day.data.next_1_hours?.details.precipitation_amount || 0,
+						(dataPoint) => dataPoint.data.next_1_hours?.details.precipitation_amount || 0,
 					),
 					barThickness: 5,
 					backgroundColor: 'rgba(0, 145, 205, 0.5)',
@@ -83,7 +86,7 @@ async function createChart() {
 				// {
 				// 	type: 'bar',
 				// 	label: 'Rain over 6h (mm)',
-				// 	data: props.forecast.map(day => (day.data.next_6_hours?.details.precipitation_amount || 0) / 6),
+				// 	data: props.forecast.map(dataPoint => (dataPoint.data.next_6_hours?.details.precipitation_amount || 0) / 6),
 				// 	backgroundColor: 'rgba(86, 160, 211, 0.8)',
 				// 	yAxisID: 'yr6',
 				// },
@@ -98,7 +101,19 @@ async function createChart() {
 					pointStyle: false,
 				},
 			},
-			plugins: defaultChartOptions.plugins,
+			plugins: {
+				...defaultChartOptions.plugins,
+				ticker: {
+					onTick(chart, event) {
+						const timestamp = chart.scales.x.getValueForPixel(event.x) as number
+						const index = props.forecast.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
+						hoveredDataPoint.value = props.forecast[index - 1] ?? props.forecast[0]
+					},
+					onTickOut() {
+						hoveredDataPoint.value = props.forecast[0]
+					},
+				},
+			},
 			scales: {
 				...defaultChartOptions.scales,
 				yc: {
@@ -131,5 +146,20 @@ watch(
 )
 </script>
 <template>
-	<canvas ref="canvas"></canvas>
+	<ForecastLayout :time="hoveredDataPoint.time">
+		<template #detail_1>
+			<span class="forecast__details__couverture">Couverture</span>
+			<span>{{ hoveredDataPoint?.data.instant.details?.cloud_area_fraction }}%</span>
+		</template>
+		<template #canvas>
+			<canvas ref="canvas"></canvas>
+		</template>
+	</ForecastLayout>
 </template>
+<style lang="scss" scoped>
+.forecast__details {
+	&__couverture {
+		color: rgba(159, 159, 163);
+	}
+}
+</style>

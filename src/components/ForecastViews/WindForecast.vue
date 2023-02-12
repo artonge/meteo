@@ -3,10 +3,11 @@ import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import Chart from 'chart.js/auto'
 import 'chartjs-adapter-date-fns'
-import { format } from 'date-fns'
+import { format, isAfter } from 'date-fns'
 import type { ForecastTimeStep } from '@/lib/met'
-import { getMax, getMin } from '@/lib/utils'
+import { formatNumber, getMax, getMin } from '@/lib/utils'
 import { defaultChartOptions, defaultChartPlugins } from './commonConfig'
+import ForecastLayout from './ForecastLayout.vue'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[]
@@ -14,6 +15,8 @@ const props = defineProps<{
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 const chart: Ref<Chart | null> = ref(null)
+
+const hoveredDataPoint: Ref<ForecastTimeStep> = ref(props.forecast[0])
 
 async function createChart() {
 	if (canvas.value === null) {
@@ -24,19 +27,19 @@ async function createChart() {
 		chart.value.destroy()
 	}
 
-	const max = getMax(props.forecast, day => day.data.instant.details?.wind_speed)
-	const min = getMin(props.forecast, day => day.data.instant.details?.wind_speed)
+	const max = getMax(props.forecast, dataPoint => dataPoint.data.instant.details?.wind_speed)
+	const min = getMin(props.forecast, dataPoint => dataPoint.data.instant.details?.wind_speed)
 
 	chart.value = new Chart(canvas.value, {
 		plugins: defaultChartPlugins,
 		data: {
-			labels: props.forecast.map((day) => day.time),
+			labels: props.forecast.map((dataPoint) => dataPoint.time),
 			datasets: [
 				{
 					type: 'line',
-					label: 'Wind',
+					label: 'Wind (Km/h)',
 					data: props.forecast.map(
-						(day) => day.data.instant.details?.wind_speed || 0,
+						(dataPoint) => dataPoint.data.instant.details?.wind_speed || 0,
 					),
 					cubicInterpolationMode: 'monotone',
 					borderColor: 'rgba(48, 195, 158, 1)',
@@ -55,7 +58,19 @@ async function createChart() {
 					pointStyle: false,
 				},
 			},
-			plugins: defaultChartOptions.plugins,
+			plugins: {
+				...defaultChartOptions.plugins,
+				ticker: {
+					onTick(chart, event) {
+						const timestamp = chart.scales.x.getValueForPixel(event.x) as number
+						const index = props.forecast.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
+						hoveredDataPoint.value = props.forecast[index - 1] ?? props.forecast[0]
+					},
+					onTickOut() {
+						hoveredDataPoint.value = props.forecast[0]
+					},
+				},
+			},
 			scales: {
 				...defaultChartOptions.scales,
 				y: {
@@ -72,5 +87,20 @@ onMounted(() => createChart())
 watch(() => props.forecast, () => createChart())
 </script>
 <template>
-	<canvas ref="canvas"></canvas>
+	<ForecastLayout :time="hoveredDataPoint.time">
+		<template #detail_1>
+			<span class="forecast__details__vitesse">Vitesse</span>
+			<span>{{ hoveredDataPoint?.data.instant.details?.wind_speed }} Km/h</span>
+		</template>
+		<template #canvas>
+			<canvas ref="canvas"></canvas>
+		</template>
+	</ForecastLayout>
 </template>
+<style lang="scss" scoped>
+.forecast__details {
+	&__vitesse {
+		color: rgba(48, 195, 158);
+	}
+}
+</style>

@@ -3,10 +3,10 @@ import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import Chart from 'chart.js/auto'
 import type { ForecastTimeStep } from '@/lib/met'
-import { getMax, getMin } from '@/lib/utils'
+import { formatNumber, getMax, getMin } from '@/lib/utils'
 import { defaultChartOptions, defaultChartPlugins } from './commonConfig'
 import { isAfter } from 'date-fns'
-import ForecastLayout from '../ForecastLayout.vue'
+import ForecastLayout from './ForecastLayout.vue'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[]
@@ -16,14 +16,6 @@ const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 const chart: Ref<Chart | null> = ref(null)
 
 const hoveredDataPoint: Ref<ForecastTimeStep> = ref(props.forecast[0])
-
-function formatNumber(n: number = 0) {
-	if (n === 0) {
-		return '0.0'
-	} else {
-		return n.toString()
-	}
-}
 
 async function createChart() {
 	if (canvas.value === null) {
@@ -144,13 +136,13 @@ watch(() => props.forecast, () => createChart())
 	</ForecastLayout>
 </template>
 <style lang="scss" scoped>
-&__details {
+.forecast__details {
 	&__temperature {
-		color: rgba(244, 137, 36, 0.8);
+		color: rgba(244, 137, 36);
 	}
 
 	&__precipitation {
-		color: rgba(86, 160, 211, 0.8);
+		color: rgba(86, 160, 211);
 	}
 }
 </style>

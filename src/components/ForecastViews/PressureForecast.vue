@@ -3,10 +3,11 @@ import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import Chart from 'chart.js/auto'
 import 'chartjs-adapter-date-fns'
-import { format } from 'date-fns'
+import { format, isAfter } from 'date-fns'
 import type { ForecastTimeStep } from '@/lib/met'
-import { getMax, getMin } from '@/lib/utils'
+import { formatNumber, getMax, getMin } from '@/lib/utils'
 import { defaultChartOptions, defaultChartPlugins } from './commonConfig'
+import ForecastLayout from './ForecastLayout.vue'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[];
@@ -14,6 +15,8 @@ const props = defineProps<{
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 const chart: Ref<Chart | null> = ref(null)
+
+const hoveredDataPoint: Ref<ForecastTimeStep> = ref(props.forecast[0])
 
 async function createChart() {
 	if (canvas.value === null) {
@@ -26,31 +29,31 @@ async function createChart() {
 
 	const maxHumidity = getMax(
 		props.forecast,
-		(day) => day.data.instant.details?.relative_humidity,
+		(dataPoint) => dataPoint.data.instant.details?.relative_humidity,
 	)
 	const minHumidity = getMin(
 		props.forecast,
-		(day) => day.data.instant.details?.relative_humidity,
+		(dataPoint) => dataPoint.data.instant.details?.relative_humidity,
 	)
 	const maxPressure = getMax(
 		props.forecast,
-		(day) => day.data.instant.details?.air_pressure_at_sea_level,
+		(dataPoint) => dataPoint.data.instant.details?.air_pressure_at_sea_level,
 	)
 	const minPressure = getMin(
 		props.forecast,
-		(day) => day.data.instant.details?.air_pressure_at_sea_level,
+		(dataPoint) => dataPoint.data.instant.details?.air_pressure_at_sea_level,
 	)
 
 	chart.value = new Chart(canvas.value, {
 		plugins: defaultChartPlugins,
 		data: {
-			labels: props.forecast.map((day) => day.time),
+			labels: props.forecast.map((dataPoint) => dataPoint.time),
 			datasets: [
 				{
 					type: 'line',
 					label: 'Humidity (%)',
 					data: props.forecast.map(
-						(day) => day.data.instant.details?.relative_humidity || 0,
+						(dataPoint) => dataPoint.data.instant.details?.relative_humidity || 0,
 					),
 					cubicInterpolationMode: 'monotone',
 					borderColor: 'rgba(3, 126, 243, 1)',
@@ -60,7 +63,7 @@ async function createChart() {
 					type: 'line',
 					label: 'Pressure (hPa)',
 					data: props.forecast.map(
-						(day) => day.data.instant.details?.air_pressure_at_sea_level || 0,
+						(dataPoint) => dataPoint.data.instant.details?.air_pressure_at_sea_level || 0,
 					),
 					cubicInterpolationMode: 'monotone',
 					borderColor: 'rgba(253, 92, 99, 1)',
@@ -73,7 +76,7 @@ async function createChart() {
 					// TODO: use unit from response
 					label: 'Accurate rain (mm)',
 					data: props.forecast.map(
-						(day) => day.data.next_1_hours?.details.precipitation_amount || 0,
+						(dataPoint) => dataPoint.data.next_1_hours?.details.precipitation_amount || 0,
 					),
 					barThickness: 5,
 					backgroundColor: 'rgba(0, 145, 205, 0.5)',
@@ -83,7 +86,7 @@ async function createChart() {
 					type: 'line',
 					label: 'Rain over 6h (mm)',
 					data: props.forecast.map(
-						(day) => (day.data.next_6_hours?.details.precipitation_amount || 0) / 6,
+						(dataPoint) => (dataPoint.data.next_6_hours?.details.precipitation_amount || 0) / 6,
 					),
 					borderColor: 'rgba(86, 160, 211, 0.3)',
 					backgroundColor: 'rgba(196, 223, 246, 0.4)',
@@ -102,7 +105,19 @@ async function createChart() {
 					pointStyle: false,
 				},
 			},
-			plugins: defaultChartOptions.plugins,
+			plugins: {
+				...defaultChartOptions.plugins,
+				ticker: {
+					onTick(chart, event) {
+						const timestamp = chart.scales.x.getValueForPixel(event.x) as number
+						const index = props.forecast.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
+						hoveredDataPoint.value = props.forecast[index - 1] ?? props.forecast[0]
+					},
+					onTickOut() {
+						hoveredDataPoint.value = props.forecast[0]
+					},
+				},
+			},
 			scales: {
 				...defaultChartOptions.scales,
 				yh: {
@@ -141,5 +156,28 @@ watch(
 )
 </script>
 <template>
-	<canvas ref="canvas"></canvas>
+	<ForecastLayout :time="hoveredDataPoint.time">
+		<template #detail_1>
+			<span class="forecast__details__humidity">Humidité</span>
+			<span>{{ hoveredDataPoint?.data.instant.details?.air_temperature }}%</span>
+		</template>
+		<template #detail_2>
+			<span class="forecast__details__pressure">Pression</span>
+			<span>{{ formatNumber(hoveredDataPoint?.data.next_6_hours?.details.precipitation_amount) }}hPa</span>
+		</template>
+		<template #canvas>
+			<canvas ref="canvas"></canvas>
+		</template>
+	</ForecastLayout>
 </template>
+<style lang="scss" scoped>
+.forecast__details {
+	&__humidity {
+		color: rgba(3, 126, 243);
+	}
+
+	&__pressure {
+		color: rgba(253, 92, 99);
+	}
+}
+</style>

@@ -29,7 +29,7 @@ const props = defineProps<{
 .forecast__details {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	align-items: flex-start;
 	padding: 8px 12px;
 
 	@media only screen and (max-width: 800px) {
