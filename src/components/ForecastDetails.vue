@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { format, isAfter } from 'date-fns'
+import { format } from 'date-fns'
 
 const props = defineProps<{
 	time: string,
 }>()
-
 </script>
 <template>
 	<div class="forecast__details">

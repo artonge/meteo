@@ -6,7 +6,7 @@ import type { ForecastTimeStep } from '@/lib/met'
 import { getMax, getMin } from '@/lib/utils'
 import { defaultChartOptions, defaultChartPlugins } from './commonConfig'
 import { isAfter } from 'date-fns'
-import ForecastDetails from '../ForecastDetails.vue'
+import ForecastLayout from '../ForecastLayout.vue'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[]
@@ -128,40 +128,29 @@ onMounted(() => createChart())
 watch(() => props.forecast, () => createChart())
 </script>
 <template>
-	<div class="forecast">
-		<ForecastDetails :time="hoveredDataPoint.time">
-			<template #detail_1>
-				<span class="forecast__details__temperature">Temperature</span>
-				<span>{{ hoveredDataPoint?.data.instant.details?.air_temperature }}°C</span>
-			</template>
-			<template #detail_2>
-				<span class="forecast__details__precipitation">Précipitations</span>
-				<span>{{ formatNumber(hoveredDataPoint?.data.next_6_hours?.details.precipitation_amount) }} mm/h</span>
-			</template>
-		</ForecastDetails>
-		<div class="forecast__chart">
+	<ForecastLayout :time="hoveredDataPoint.time">
+		<template #detail_1>
+			<span class="forecast__details__temperature">Temperature</span>
+			<span>{{ hoveredDataPoint?.data.instant.details?.air_temperature }}°C</span>
+		</template>
+		<template #detail_2>
+			<span class="forecast__details__precipitation">Précipitations</span>
+			<span>{{ formatNumber(hoveredDataPoint?.data.next_6_hours?.details.precipitation_amount) }}
+				mm/h</span>
+		</template>
+		<template #canvas>
 			<canvas ref="canvas"></canvas>
-		</div>
-	</div>
+		</template>
+	</ForecastLayout>
 </template>
 <style lang="scss" scoped>
-.forecast {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-
-	&__details {
-		&__temperature {
-			color: rgba(244, 137, 36, 0.8);
-		}
-
-		&__precipitation {
-			color: rgba(86, 160, 211, 0.8);
-		}
+&__details {
+	&__temperature {
+		color: rgba(244, 137, 36, 0.8);
 	}
 
-	&__chart {
-		flex-grow: 1;
+	&__precipitation {
+		color: rgba(86, 160, 211, 0.8);
 	}
 }
 </style>
