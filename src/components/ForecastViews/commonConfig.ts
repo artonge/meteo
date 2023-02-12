@@ -15,9 +15,12 @@ export const defaultChartOptions: ChartOptions<'line'> = {
 			ticks: {
 				callback: (val) => format(new Date(val), 'ccc'),
 				align: 'start',
+				font: {
+					size: 16,
+				},
 			},
 			grid: {
-				color: 'gray',
+				color: 'rgba(68, 76, 86)',
 				offset: false,
 			},
 			offset: false,

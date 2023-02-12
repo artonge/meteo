@@ -7,7 +7,6 @@
 // TODO: Improve loading state style of geolocation button
 // TODO: Extend ticker to the bottom scale
 // TODO: Allow to move the cursor from the bottom scale
-// TODO: Increase bottom scale height
 import { ref, watch, onMounted, type Ref } from 'vue'
 import Flicking from '@egjs/vue3-flicking'
 import '@egjs/vue3-flicking/dist/flicking.css'
