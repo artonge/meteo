@@ -3,6 +3,7 @@ import type { ChartOptions, Plugin } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import zoomPlugin from 'chartjs-plugin-zoom'
 import 'chartjs-adapter-date-fns'
+import { tickerPlugin } from '@/plugins/ticker'
 
 export const defaultChartOptions: ChartOptions<'line'> = {
 	scales: {
@@ -72,4 +73,5 @@ export const defaultChartOptions: ChartOptions<'line'> = {
 export const defaultChartPlugins: Plugin<'line'>[] = [
 	ChartDataLabels,
 	zoomPlugin,
+	tickerPlugin,
 ]
