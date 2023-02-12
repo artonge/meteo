@@ -27,6 +27,9 @@ export const defaultChartOptions: ChartOptions<'line'> = {
 		tooltip: {
 			enabled: false,
 		},
+		legend: {
+			display: false,
+		},
 		datalabels: {
 			color: 'gray',
 			align: 'top',
