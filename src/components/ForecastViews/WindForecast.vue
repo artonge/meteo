@@ -3,15 +3,21 @@ import { ref, watch, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import Chart from 'chart.js/auto'
 import 'chartjs-adapter-date-fns'
-import { format, isAfter } from 'date-fns'
+import { isAfter } from 'date-fns'
 import type { ForecastTimeStep } from '@/lib/met'
-import { formatNumber, getMax, getMin } from '@/lib/utils'
-import { defaultChartOptions, defaultChartPlugins } from './commonConfig'
+import { getMax, getMin } from '@/lib/utils'
+import { defaultChartOptions, defaultChartPlugins, getTickerPluginOptions, getZoomPluginOptions } from './commonConfig'
 import ForecastLayout from './ForecastLayout.vue'
 
 const props = defineProps<{
-	forecast: ForecastTimeStep[]
+	forecast: ForecastTimeStep[],
+	zoom: {
+		scale: number,
+		offset: number,
+	},
 }>()
+
+const emit = defineEmits(['update:zoom'])
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 const chart: Ref<Chart | null> = ref(null)
@@ -60,16 +66,8 @@ async function createChart() {
 			},
 			plugins: {
 				...defaultChartOptions.plugins,
-				ticker: {
-					onTick(chart, event) {
-						const timestamp = chart.scales.x.getValueForPixel(event.x) as number
-						const index = props.forecast.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
-						hoveredDataPoint.value = props.forecast[index - 1] ?? props.forecast[0]
-					},
-					onTickOut() {
-						hoveredDataPoint.value = props.forecast[0]
-					},
-				},
+				zoom: getZoomPluginOptions(emit),
+				ticker: getTickerPluginOptions(props.forecast, hoveredDataPoint),
 			},
 			scales: {
 				...defaultChartOptions.scales,

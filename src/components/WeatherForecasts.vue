@@ -21,6 +21,10 @@ import WindForecast from './ForecastViews/WindForecast.vue'
 
 const props = defineProps<{ city: City }>()
 const forecast: Ref<METJSONForecast | null> = ref(null)
+const zoom = ref({
+	scale: 1,
+	offset: 0,
+})
 
 watch(() => props.city, () => fetchForecast(props.city.latitude, props.city.longitude))
 onMounted(async () => {
@@ -33,22 +37,38 @@ async function fetchForecast(latitude: number, longitude: number) {
 		longitude,
 	)(fetch)
 }
+
+function handleHoldStart(event) {
+	console.log("Flicking: holdStart", zoom, event)
+
+	if (zoom.value.scale === 1) {
+		return
+	}
+
+	if (zoom.value.offset === 0 || zoom.value.offset === 100) {
+		return
+	}
+
+	event.stop()
+}
+
+
 </script>
 <template>
 	<Flicking v-if="forecast !== null" :options="{
 		align: 'prev', circular: true, panelsPerView: 1, moveType: ['strict', { count: 1 }]
-	}">
+	}" @holdStart="handleHoldStart">
 		<div :key="0">
-			<TemperatureForecast :forecast="forecast.properties.timeseries" />
+			<TemperatureForecast v-model:zoom="zoom" :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="1">
-			<CloudForecast :forecast="forecast.properties.timeseries" />
+			<CloudForecast v-model:zoom="zoom" :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="2">
-			<PressureForecast :forecast="forecast.properties.timeseries" />
+			<PressureForecast v-model:zoom="zoom" :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="3">
-			<WindForecast :forecast="forecast.properties.timeseries" />
+			<WindForecast v-model:zoom="zoom" :forecast="forecast.properties.timeseries" />
 		</div>
 	</Flicking>
 </template>
