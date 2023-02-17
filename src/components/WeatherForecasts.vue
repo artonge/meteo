@@ -1,12 +1,9 @@
 <script setup lang="ts">
 // TODO: Increase snap to next panel when swiping (swiping just a little snap to the next panel)
 // TODO: Increase discoverability of other panels
-// TODO: Allow to move around the graph when zoomed
 // TODO: Support other weather providers
 // TODO: Improve disabled state style of header input
 // TODO: Improve loading state style of geolocation button
-// TODO: Extend ticker to the bottom scale
-// TODO: Allow to move the cursor from the bottom scale
 import { ref, watch, onMounted, type Ref } from 'vue'
 import Flicking, { type HoldStartEvent } from '@egjs/vue3-flicking'
 import '@egjs/vue3-flicking/dist/flicking.css'
@@ -25,6 +22,7 @@ const zoom = ref({
 	scale: 1,
 	offset: 0,
 })
+const ticker = ref(0)
 
 watch(() => props.city, () => fetchForecast(props.city.latitude, props.city.longitude))
 onMounted(async () => {
@@ -51,24 +49,22 @@ function handleHoldStart(event: HoldStartEvent) {
 
 	event.stop()
 }
-
-
 </script>
 <template>
 	<Flicking v-if="forecast !== null" :options="{
 		align: 'prev', circular: true, panelsPerView: 1, moveType: ['strict', { count: 1 }]
 	}" @holdStart="handleHoldStart">
 		<div :key="0">
-			<TemperatureForecast v-model:zoom="zoom" :forecast="forecast.properties.timeseries" />
+			<TemperatureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="1">
-			<CloudForecast v-model:zoom="zoom" :forecast="forecast.properties.timeseries" />
+			<CloudForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="2">
-			<PressureForecast v-model:zoom="zoom" :forecast="forecast.properties.timeseries" />
+			<PressureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast.properties.timeseries" />
 		</div>
 		<div :key="3">
-			<WindForecast v-model:zoom="zoom" :forecast="forecast.properties.timeseries" />
+			<WindForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast.properties.timeseries" />
 		</div>
 	</Flicking>
 </template>

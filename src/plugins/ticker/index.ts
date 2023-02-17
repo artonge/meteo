@@ -16,7 +16,7 @@ function isTouchEvent(event: UIEvent): event is TouchEvent {
 	return event.type === 'touchmove' || event.type === 'touchstart'
 }
 
-function drawTraceLine(chart: Chart, event: MouseEvent | TouchEvent, touchCanceled, cancelTouch: () => void) {
+function handlePointerEvent(chart: Chart, event: MouseEvent | TouchEvent, touchCanceled, cancelTouch: () => void) {
 	// Get mouse location inside canvas
 	const { x: canvasX, y: canvasY } = chart.canvas.getBoundingClientRect()
 	let x = 0
@@ -44,6 +44,15 @@ function drawTraceLine(chart: Chart, event: MouseEvent | TouchEvent, touchCancel
 		y = event.clientY - canvasY
 	}
 
+	drawTraceLine(chart, x)
+
+	const onTick = getOption(chart, 'onTick')
+	if (onTick !== undefined) {
+		onTick(chart, x)
+	}
+}
+
+function drawTraceLine(chart: Chart, x: number) {
 	const yScale = chart.scales[chart.getDatasetMeta(0).yAxisID as string]
 
 	chart.draw()
@@ -71,19 +80,13 @@ export const tickerPlugin: Plugin = {
 		chart.options.plugins.ticker.abortController = new AbortController()
 
 		let touchCanceled = false
-
 		function drawTicker(event: MouseEvent | TouchEvent) {
-			drawTraceLine(chart, event, touchCanceled, () => touchCanceled = true)
-			const onTick = getOption(chart, 'onTick')
-			if (onTick !== undefined) {
-				onTick(chart, event)
-			}
+			handlePointerEvent(chart, event, touchCanceled, () => touchCanceled = true)
 		}
 		chart.canvas.addEventListener('mousemove', drawTicker, { signal: getOption(chart, 'abortController').signal })
 		chart.canvas.addEventListener('touchstart', drawTicker, { signal: getOption(chart, 'abortController').signal })
 		chart.canvas.addEventListener('touchmove', drawTicker, { signal: getOption(chart, 'abortController').signal })
 		chart.canvas.addEventListener('touchend', () => touchCanceled = false, { signal: getOption(chart, 'abortController').signal })
-
 		chart.canvas.addEventListener(
 			'mouseleave',
 			(event) => {
@@ -95,6 +98,11 @@ export const tickerPlugin: Plugin = {
 			},
 			{ signal: getOption(chart, 'abortController').signal }
 		)
+
+		chart.setTicker = (x: number) => {
+			if (x === -1) return
+			drawTraceLine(chart, x)
+		}
 	},
 
 	afterDestroy(chart) {

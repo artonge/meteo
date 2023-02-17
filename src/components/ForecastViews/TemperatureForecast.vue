@@ -10,13 +10,14 @@ import ForecastLayout from './ForecastLayout.vue'
 
 const props = defineProps<{
 	forecast: ForecastTimeStep[],
+	ticker: number,
 	zoom: {
 		scale: number,
 		offset: number,
 	},
 }>()
 
-const emit = defineEmits(['update:zoom'])
+const emit = defineEmits(['update:zoom', 'update:ticker'])
 
 const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 const chart: Ref<Chart | null> = ref(null)
@@ -89,7 +90,7 @@ async function createChart() {
 			plugins: {
 				...defaultChartOptions.plugins,
 				zoom: getZoomPluginOptions(emit),
-				ticker: getTickerPluginOptions(props.forecast, hoveredDataPoint),
+				ticker: getTickerPluginOptions(props.forecast, hoveredDataPoint, emit),
 			},
 			scales: {
 				...defaultChartOptions.scales,
@@ -116,6 +117,11 @@ async function createChart() {
 
 onMounted(() => createChart())
 watch(() => props.forecast, () => createChart())
+watch(() => props.ticker, (tickerValue) => {
+	if (canvas.value?.offsetLeft === 0) {
+		chart.value?.setTicker(tickerValue)
+	}
+})
 watch(() => props.zoom, () => {
 	console.log('zoom updated')
 })

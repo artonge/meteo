@@ -9,6 +9,7 @@ import 'chartjs-adapter-date-fns'
 import { tickerPlugin } from '@/plugins/ticker'
 import type { TickerOptions } from '@/plugins/ticker/index.d'
 import type { ForecastTimeStep } from '@/lib/met'
+import { isTouchEvent } from '@/lib/utils'
 
 export declare type ObjectEmitsOptions = Record<string, ((...args: any[]) => any) | null>;
 declare type EmitFn<Options = ObjectEmitsOptions, Event extends keyof Options = keyof Options> = Options extends Array<infer V> ? (event: V, ...args: any[]) => void : {} extends Options ? (event: string, ...args: any[]) => void : UnionToIntersection<{
@@ -64,14 +65,16 @@ export const defaultChartOptions: ChartOptions<'line'> = {
 	}
 }
 
-export function getTickerPluginOptions(forecast: ForecastTimeStep[], hoveredDataPoint: Ref<ForecastTimeStep>): Partial<TickerOptions> {
+export function getTickerPluginOptions(forecast: ForecastTimeStep[], hoveredDataPoint: Ref<ForecastTimeStep>, emit: EmitFn<['update:ticker']>): Partial<TickerOptions> {
 	return {
-		onTick(chart, event) {
-			const timestamp = chart.scales.x.getValueForPixel(event.x) as number
+		onTick(chart, x) {
+			const timestamp = chart.scales.x.getValueForPixel(x) as number
 			const index = forecast.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
 			hoveredDataPoint.value = forecast[index - 1] ?? forecast[0]
+			setTimeout(() => emit('update:ticker', x))
 		},
 		onTickOut() {
+			setTimeout(() => emit('update:ticker', -1))
 			hoveredDataPoint.value = forecast[0]
 		},
 	}
