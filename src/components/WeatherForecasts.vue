@@ -39,7 +39,6 @@ async function fetchForecast(latitude: number, longitude: number) {
 }
 
 function handleHoldStart(event: HoldStartEvent) {
-	console.log(zoom.value.scale, zoom.value.offset)
 	// Allow swiping to next or previous chart when not zoomed.
 	if (zoom.value.scale === 1) {
 		return

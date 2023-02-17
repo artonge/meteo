@@ -12,15 +12,46 @@ function getOption<T extends keyof TickerOptions>(chart: Chart, name: T): Ticker
 	return (chart.options?.plugins?.ticker?.[name] ?? getDefaultOptions()[name]) as TickerOptions[T]
 }
 
-function drawTraceLine(chart: Chart, event: MouseEvent) {
+function isTouchEvent(event: UIEvent): event is TouchEvent {
+	return event.type === 'touchmove' || event.type === 'touchstart'
+}
+
+function drawTraceLine(chart: Chart, event: MouseEvent | TouchEvent, touchCanceled, cancelTouch: () => void) {
+	// Get mouse location inside canvas
+	const { x: canvasX, y: canvasY } = chart.canvas.getBoundingClientRect()
+	let x = 0
+	let y = 0
+
+	if (isTouchEvent(event)) {
+		x = event.touches[0].clientX - canvasX
+		y = event.touches[0].clientY - canvasY
+
+		// Ignore touch starting outside of the bottom scale.
+		// Add a 50% extra space to trigger it on mobile as the bottom scale is a bit small.
+		const isBellowTopOfScale = (chart.scales.x.top - 0.5 * (chart.scales.x.bottom - chart.scales.x.top)) < y
+		const isAboveBottomOfScale = y < chart.scales.x.bottom
+		if (event.type === 'touchstart' && !(isBellowTopOfScale && isAboveBottomOfScale)) {
+			cancelTouch()
+			return
+		}
+
+		if (event.type === 'touchmove' && touchCanceled) {
+			return
+		}
+		event.stopPropagation()
+	} else {
+		x = event.clientX - canvasX
+		y = event.clientY - canvasY
+	}
+
 	const yScale = chart.scales[chart.getDatasetMeta(0).yAxisID as string]
 
 	chart.draw()
 	chart.ctx.beginPath();
-	chart.ctx.moveTo(event.x, yScale.getPixelForValue(yScale.max));
+	chart.ctx.moveTo(x, yScale.getPixelForValue(yScale.max));
 	chart.ctx.lineWidth = getOption(chart, 'width') as number;
 	chart.ctx.strokeStyle = getOption(chart, 'color') as string;
-	chart.ctx.lineTo(event.x, yScale.getPixelForValue(yScale.min));
+	chart.ctx.lineTo(x, chart.scales.x.bottom);
 	chart.ctx.stroke();
 	chart.ctx.setLineDash([]);
 }
@@ -39,17 +70,19 @@ export const tickerPlugin: Plugin = {
 
 		chart.options.plugins.ticker.abortController = new AbortController()
 
-		chart.canvas.addEventListener(
-			'mousemove',
-			(event) => {
-				drawTraceLine(chart, event)
-				const onTick = getOption(chart, 'onTick')
-				if (onTick !== undefined) {
-					onTick(chart, event)
-				}
-			},
-			{ signal: getOption(chart, 'abortController').signal },
-		)
+		let touchCanceled = false
+
+		function drawTicker(event: MouseEvent | TouchEvent) {
+			drawTraceLine(chart, event, touchCanceled, () => touchCanceled = true)
+			const onTick = getOption(chart, 'onTick')
+			if (onTick !== undefined) {
+				onTick(chart, event)
+			}
+		}
+		chart.canvas.addEventListener('mousemove', drawTicker, { signal: getOption(chart, 'abortController').signal })
+		chart.canvas.addEventListener('touchstart', drawTicker, { signal: getOption(chart, 'abortController').signal })
+		chart.canvas.addEventListener('touchmove', drawTicker, { signal: getOption(chart, 'abortController').signal })
+		chart.canvas.addEventListener('touchend', () => touchCanceled = false, { signal: getOption(chart, 'abortController').signal })
 
 		chart.canvas.addEventListener(
 			'mouseleave',

@@ -3,8 +3,8 @@ import { Chart, ChartType, Plugin } from 'chart.js';
 export interface TickerOptions {
 	color: string,
 	width: number,
-	onTick?(chart: Chart, event: MouseEvent),
-	onTickOut?(chart: Chart, event: MouseEvent),
+	onTick?(chart: Chart, event: MouseEvent | TouchEvent),
+	onTickOut?(chart: Chart, event: MouseEvent | TouchEvent),
 	abortController: AbortController,
 }
 
