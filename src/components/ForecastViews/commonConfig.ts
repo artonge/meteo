@@ -1,14 +1,14 @@
-
+import type { Ref } from 'vue'
 import { format, isAfter } from 'date-fns'
-import type { ChartOptions, Plugin } from 'chart.js'
+import type { ChartOptions, Plugin, Chart } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import zoomPlugin from 'chartjs-plugin-zoom'
 import type { ZoomPluginOptions } from 'chartjs-plugin-zoom/types/options'
 import 'chartjs-adapter-date-fns'
+
 import { tickerPlugin } from '@/plugins/ticker'
 import type { TickerOptions } from '@/plugins/ticker/index.d'
 import type { ForecastTimeStep } from '@/lib/met'
-import type { Ref } from 'vue'
 
 export declare type ObjectEmitsOptions = Record<string, ((...args: any[]) => any) | null>;
 declare type EmitFn<Options = ObjectEmitsOptions, Event extends keyof Options = keyof Options> = Options extends Array<infer V> ? (event: V, ...args: any[]) => void : {} extends Options ? (event: string, ...args: any[]) => void : UnionToIntersection<{
@@ -77,17 +77,26 @@ export function getTickerPluginOptions(forecast: ForecastTimeStep[], hoveredData
 	}
 }
 
+function computedPanOffset(chart: Chart) {
+	const halfWindow = (chart.scales.x.max - chart.scales.x.min) / 2
+	const mid = chart.scales.x.min + halfWindow
+	const { x: { max: initialMax, min: initialMin } } = chart.getInitialScaleBounds()
+	const windowedMax = initialMax - halfWindow
+	const windowedMin = initialMin + halfWindow
+	return (mid - windowedMin) / (windowedMax - windowedMin)
+}
+
 export function getZoomPluginOptions(emit: EmitFn<['update:zoom']>): ZoomPluginOptions {
 	return {
 		pan: {
 			enabled: true,
 			mode: 'x',
 			scaleMode: 'x',
-			onPan({ chart, event, point }) {
-				console.log("onPan", new Date(chart.scales.x.min))
+			onPanStart({ chart }) { return chart.getZoomLevel() !== 1 && computedPanOffset(chart) !== 0 && computedPanOffset(chart) !== 1 },
+			onPan({ chart }) {
 				emit('update:zoom', {
 					scale: chart.getZoomLevel(),
-					offset: 1,
+					offset: computedPanOffset(chart),
 				})
 				return true
 			},
@@ -101,10 +110,9 @@ export function getZoomPluginOptions(emit: EmitFn<['update:zoom']>): ZoomPluginO
 				enabled: true
 			},
 			onZoom({ chart }) {
-				console.log("pan", chart.scales.x)
 				emit('update:zoom', {
 					scale: chart.getZoomLevel(),
-					offset: 1,
+					offset: computedPanOffset(chart),
 				})
 			}
 		},

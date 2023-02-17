@@ -8,7 +8,7 @@
 // TODO: Extend ticker to the bottom scale
 // TODO: Allow to move the cursor from the bottom scale
 import { ref, watch, onMounted, type Ref } from 'vue'
-import Flicking from '@egjs/vue3-flicking'
+import Flicking, { type HoldStartEvent } from '@egjs/vue3-flicking'
 import '@egjs/vue3-flicking/dist/flicking.css'
 
 import { DataApiFp, METJSONForecast } from '@/lib/met'
@@ -38,14 +38,15 @@ async function fetchForecast(latitude: number, longitude: number) {
 	)(fetch)
 }
 
-function handleHoldStart(event) {
-	console.log("Flicking: holdStart", zoom, event)
-
+function handleHoldStart(event: HoldStartEvent) {
+	console.log(zoom.value.scale, zoom.value.offset)
+	// Allow swiping to next or previous chart when not zoomed.
 	if (zoom.value.scale === 1) {
 		return
 	}
 
-	if (zoom.value.offset === 0 || zoom.value.offset === 100) {
+	// Allow swiping to next or previous chart when on edges.
+	if (zoom.value.offset === 0 || zoom.value.offset === 1) {
 		return
 	}
 
