@@ -52,12 +52,21 @@ export async function fetchCities() {
 
 	const response = await fetch('/cities.json')
 	await citiesDb.cities.bulkAdd(await response.json())
-	console.log('Cities DB populated')
+	console.log('City DB populated')
+}
+
+export function isCitiesIndexLoaded(): boolean {
+	return citiesFuse.getIndex().size() !== 0
 }
 
 export async function createCitiesIndex() {
+	if (isCitiesIndexLoaded()) {
+		return
+	}
+
+	console.log('Creating city index with', await citiesDb.cities.toArray(), 'cities')
 	citiesFuse.setCollection(await citiesDb.cities.toArray())
-	console.log('Index created')
+	console.log('City index created with', citiesFuse.getIndex().size(), 'cities')
 }
 
 export function searchCities(searchQuery: string): City[] {

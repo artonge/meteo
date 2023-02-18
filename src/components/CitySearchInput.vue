@@ -10,11 +10,12 @@ import { debounce } from 'debounce'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
-import { createCitiesIndex, fetchCities, searchCities, type City } from '@/lib/cities'
+import { createCitiesIndex, fetchCities, isCitiesIndexLoaded, searchCities, type City } from '@/lib/cities'
 
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
 
 const initialLoading = ref(true)
+const loading = ref(false)
 const selectedCity: Ref<City | null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
 const foundCities: Ref<City[]> = ref([])
 const loadingCurrentLocation = ref(false)
@@ -30,22 +31,39 @@ if (selectedCity.value !== null) {
 
 onMounted(async () => {
 	await fetchCities()
-	await createCitiesIndex()
 	initialLoading.value = false
 })
 
-function searchCity(query: string, toggleLoading: Function) {
+
+let savedQuery = ''
+async function handleSelectOpen() {
+	await createCitiesIndex()
+
+	if (savedQuery !== '') {
+		console.debug('Rerun query after index loaded:', savedQuery)
+		searchCity(savedQuery)
+	}
+}
+
+function searchCity(query: string) {
 	if (query === '') {
 		return
 	}
 
-	toggleLoading(true)
+	loading.value = true
+
+	if (!isCitiesIndexLoaded()) {
+		console.debug('Index not loaded, saving query:', query)
+		savedQuery = query
+		return
+	}
+
 	// Need to wrap into a timeout as search city is synchronous.
 	// So vue do not render before the response and the loading icon is not displayed.
 	setTimeout(() => {
 		foundCities.value = searchCities(query)
 		console.debug('Found cities:', foundCities.value)
-		toggleLoading(false)
+		loading.value = false
 	})
 }
 
@@ -92,7 +110,8 @@ function handleGeolocationRequest() {
 <template>
 	<div class="location-input">
 		<v-select class="city-select" :options="foundCities" :filterable="false" v-model="selectedCity"
-			:disabled="initialLoading" placeholder="Search a city name. Ex: Paris" @search="debouncedSearchCity"
+			:disabled="initialLoading" placeholder="Search a city name. Ex: Paris" :loading="loading"
+			@open="handleSelectOpen" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
 			<template #no-options> Type to search a city</template>
 		</v-select>
