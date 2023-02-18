@@ -55,7 +55,7 @@ export function setupForecastView(
 		if (chart.value !== null) {
 			chart.value.destroy()
 		}
-		console.log(canvas.value, getDatasets(props.forecast))
+
 		chart.value = new Chart(canvas.value, {
 			plugins: [
 				ChartDataLabels,
