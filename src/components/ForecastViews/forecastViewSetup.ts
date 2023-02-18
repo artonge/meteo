@@ -1,47 +1,40 @@
-import { ref, watch, onMounted, defineProps, defineEmits, type Ref } from 'vue'
+import { ref, watch, onMounted, type Ref } from 'vue'
 import { format, isAfter } from 'date-fns'
 import 'chartjs-adapter-date-fns'
-import { Chart, type ChartDatasetCustomTypesPerDataset, type ChartOptions } from 'chart.js'
+import { Chart, type ChartDatasetCustomTypesPerDataset, type ChartOptions } from 'chart.js/auto'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import zoomPlugin from 'chartjs-plugin-zoom'
 import type { ForecastTimeStep } from '@/lib/met'
 import { computedPanOffset } from '@/lib/utils'
 import { tickerPlugin } from '@/plugins/ticker'
 
-type _defineProps = typeof defineProps
-type _defineEmits = typeof defineEmits
-
-export function setupForecastView<TType, TData>(
-	_: {
-		defineProps: _defineProps,
-		defineEmits: _defineEmits,
-	},
+export function setupForecastView(
+	props: Readonly<{
+		forecast: ForecastTimeStep[];
+		ticker: number;
+		zoom: {
+			scale: number;
+			offset: number;
+		};
+	}>,
+	emit: (event: "update:zoom" | "update:ticker", ...args: any[]) => void,
 	getDatasets: (forecast: ForecastTimeStep[]) => ChartDatasetCustomTypesPerDataset[],
 	getScales: (forecast: ForecastTimeStep[]) => ChartOptions<'line'>['scales'],
 ) {
-	const props = defineProps<{
-		forecast: ForecastTimeStep[],
-		ticker: number,
-		zoom: {
-			scale: number,
-			offset: number,
-		},
-	}>()
-
-	const emit = defineEmits(['update:zoom', 'update:ticker'])
-
 	const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 	const chart: Ref<Chart | null> = ref(null)
 	const hoveredDataPoint: Ref<ForecastTimeStep | null> = ref(null)
 
-	onMounted(createChart)
+	onMounted(() => {
+		createChart()
+	})
 
 	watch(() => props.forecast, () => {
 		createChart()
 		if (props.forecast.length > 0) {
 			hoveredDataPoint.value = props.forecast[0]
 		}
-	})
+	}, { immediate: true })
 
 	watch(() => props.ticker, (tickerValue) => {
 		if (canvas.value?.offsetLeft === 0) {
@@ -57,7 +50,7 @@ export function setupForecastView<TType, TData>(
 		if (chart.value !== null) {
 			chart.value.destroy()
 		}
-
+		console.log(canvas.value, getDatasets(props.forecast))
 		chart.value = new Chart(canvas.value, {
 			plugins: [
 				ChartDataLabels,
@@ -181,5 +174,5 @@ export function setupForecastView<TType, TData>(
 		})
 	}
 
-	return { props, emit, hoveredDataPoint }
+	return { props, emit, hoveredDataPoint, canvas, chart }
 }

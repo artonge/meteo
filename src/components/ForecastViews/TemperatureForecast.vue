@@ -4,54 +4,20 @@ import { formatNumber, getMax, getMin } from '@/lib/utils'
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 
-const { hoveredDataPoint } = setupForecastView(
-	{ defineProps, defineEmits },
+const props = defineProps<{
+	forecast: ForecastTimeStep[],
+	ticker: number,
+	zoom: {
+		scale: number,
+		offset: number,
+	},
+}>()
+
+const emit = defineEmits(['update:zoom', 'update:ticker'])
+
+const { hoveredDataPoint, canvas } = setupForecastView(
+	props, emit,
 	(forecast: ForecastTimeStep[]) => [
-		{
-			type: 'line',
-			label: 'Humidity (%)',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.instant.details?.relative_humidity || 0,
-			),
-			cubicInterpolationMode: 'monotone',
-			borderColor: 'rgba(3, 126, 243, 1)',
-			yAxisID: 'yh',
-		},
-		{
-			type: 'line',
-			label: 'Pressure (hPa)',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.instant.details?.air_pressure_at_sea_level || 0,
-			),
-			cubicInterpolationMode: 'monotone',
-			borderColor: 'rgba(253, 92, 99, 1)',
-			backgroundColor: 'rgba(253, 92, 99, 0.2)',
-			fill: 'origin',
-			yAxisID: 'yp',
-		},
-		{
-			type: 'bar',
-			// TODO: use unit from response
-			label: 'Accurate rain (mm)',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.next_1_hours?.details.precipitation_amount || 0,
-			),
-			barThickness: 5,
-			backgroundColor: 'rgba(0, 145, 205, 0.5)',
-			yAxisID: 'yr1',
-		},
-		{
-			type: 'line',
-			label: 'Rain over 6h (mm)',
-			data: forecast.map(
-				(dataPoint) => (dataPoint.data.next_6_hours?.details.precipitation_amount || 0) / 6,
-			),
-			borderColor: 'rgba(86, 160, 211, 0.3)',
-			backgroundColor: 'rgba(196, 223, 246, 0.4)',
-			cubicInterpolationMode: 'monotone',
-			fill: 'origin',
-			yAxisID: 'yr6',
-		},
 		{
 			type: 'line',
 			label: 'Temperature (°C)',

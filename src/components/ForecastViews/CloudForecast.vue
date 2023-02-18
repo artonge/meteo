@@ -3,8 +3,19 @@ import type { ForecastTimeStep } from '@/lib/met';
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 
-const { hoveredDataPoint } = setupForecastView(
-	{ defineProps, defineEmits },
+const props = defineProps<{
+	forecast: ForecastTimeStep[],
+	ticker: number,
+	zoom: {
+		scale: number,
+		offset: number,
+	},
+}>()
+
+const emit = defineEmits(['update:zoom', 'update:ticker'])
+
+const { hoveredDataPoint, canvas } = setupForecastView(
+	props, emit,
 	(forecast: ForecastTimeStep[]) => [
 		{
 			type: 'line',
