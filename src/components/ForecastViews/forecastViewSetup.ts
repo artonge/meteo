@@ -88,18 +88,28 @@ export function setupForecastView(
 						color: 'gray',
 						align: 'top',
 						display: function (context) {
+							// Only show label for the first dataset.
 							if (context.datasetIndex !== 0) {
 								return false
 							}
 
+							// Do no show label for the first data point.
+							if (context.dataIndex === 0) {
+								return false
+							}
+
+							const time = props.forecast[context.dataIndex].time.slice(0, 10)
+							const firstPointOfDayIndex = props.forecast.findIndex(dataPoint => dataPoint.time.slice(0, 10) === time)
+							const lastPointOfDayIndex = props.forecast.slice(firstPointOfDayIndex).findIndex(dataPoint => time !== dataPoint.time.slice(0, 10)) - 1
+							const pointsForDay = context.dataset.data.slice(firstPointOfDayIndex, lastPointOfDayIndex + firstPointOfDayIndex)
+
 							const value = context.dataset.data[context.dataIndex] as number
-							const prev = context.dataset.data[context.dataIndex - 1] ?? value
-							const next = context.dataset.data[context.dataIndex + 1] ?? value
+							const isHightest = !pointsForDay.some(dataPointValue => (dataPointValue as number) > value)
+							const isLowest = !pointsForDay.some(dataPointValue => (dataPointValue as number) < value)
+							const isUniq = pointsForDay.filter(dataPointValue => (dataPointValue as number) === value).length === 1
+							const isFirst = pointsForDay.findIndex(dataPointValue => (dataPointValue as number) === value) + firstPointOfDayIndex === context.dataIndex
 
-							const isLocalMax = prev < value && value > next
-							const isLocalMin = prev > value && value < next
-
-							return context.dataIndex === 0 || isLocalMax || isLocalMin
+							return (isHightest || isLowest) && (isUniq || isFirst)
 						},
 					},
 					zoom: {
