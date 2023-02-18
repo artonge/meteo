@@ -16,7 +16,7 @@ function isTouchEvent(event: UIEvent): event is TouchEvent {
 	return event.type === 'touchmove' || event.type === 'touchstart'
 }
 
-function handlePointerEvent(chart: Chart, event: MouseEvent | TouchEvent, touchCanceled, cancelTouch: () => void) {
+function handlePointerEvent(chart: Chart, event: MouseEvent | TouchEvent, touchCanceled: boolean, cancelTouch: () => void) {
 	// Get mouse location inside canvas
 	const { x: canvasX, y: canvasY } = chart.canvas.getBoundingClientRect()
 	let x = 0
@@ -89,11 +89,11 @@ export const tickerPlugin: Plugin = {
 		chart.canvas.addEventListener('touchend', () => touchCanceled = false, { signal: getOption(chart, 'abortController').signal })
 		chart.canvas.addEventListener(
 			'mouseleave',
-			(event) => {
+			() => {
 				chart.draw()
 				const onTickOut = getOption(chart, 'onTickOut')
 				if (onTickOut !== undefined) {
-					onTickOut(chart, event)
+					onTickOut(chart)
 				}
 			},
 			{ signal: getOption(chart, 'abortController').signal }
