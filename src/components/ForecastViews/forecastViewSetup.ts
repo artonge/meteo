@@ -7,6 +7,7 @@ import zoomPlugin from 'chartjs-plugin-zoom'
 import type { ForecastTimeStep } from '@/lib/met'
 import { computedPanOffset } from '@/lib/utils'
 import { tickerPlugin } from '@/plugins/ticker'
+import { debounce } from 'debounce'
 
 export function setupForecastView(
 	props: Readonly<{
@@ -41,6 +42,10 @@ export function setupForecastView(
 			chart.value?.setTicker(tickerValue)
 		}
 	})
+
+	function emitUpdateTicker(x: number) {
+		emit('update:ticker', x)
+	}
 
 	function createChart() {
 		if (canvas.value === null) {
@@ -139,12 +144,10 @@ export function setupForecastView(
 							const timestamp = chart.scales.x.getValueForPixel(x) as number
 							const index = props.forecast.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
 							hoveredDataPoint.value = props.forecast[index - 1] ?? props.forecast[0]
-							// Asynchronously emit event to not block rendering.
-							setTimeout(() => emit('update:ticker', x))
+							debounce(emitUpdateTicker.bind(this, x), 1000)
 						},
 						onTickOut() {
-							// Asynchronously emit event to not block rendering.
-							setTimeout(() => emit('update:ticker', -1))
+							emitUpdateTicker(-1)
 							hoveredDataPoint.value = props.forecast[0]
 						},
 					},
