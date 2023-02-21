@@ -1,17 +1,17 @@
 import { ref, watch, onMounted, type Ref } from 'vue'
-import { format, isAfter } from 'date-fns'
+import { format, isAfter, isSameDay, addDays } from 'date-fns'
 import 'chartjs-adapter-date-fns'
 import { Chart, type ChartDatasetCustomTypesPerDataset, type ChartOptions } from 'chart.js/auto'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import zoomPlugin from 'chartjs-plugin-zoom'
-import type { ForecastTimeStep } from '@/lib/met'
+import type { Forecast, HourlyForecast } from '@/lib/open-meteo';
 import { computedPanOffset } from '@/lib/utils'
 import { tickerPlugin } from '@/plugins/ticker'
 import { debounce } from 'debounce'
 
 export function setupForecastView(
 	props: Readonly<{
-		forecast: ForecastTimeStep[];
+		forecast: Forecast;
 		ticker: number;
 		zoom: {
 			scale: number;
@@ -19,12 +19,12 @@ export function setupForecastView(
 		};
 	}>,
 	emit: (event: "update:zoom" | "update:ticker", ...args: any[]) => void,
-	getDatasets: (forecast: ForecastTimeStep[]) => ChartDatasetCustomTypesPerDataset[],
-	getScales: (forecast: ForecastTimeStep[]) => ChartOptions<'line'>['scales'],
+	getDatasets: (forecast: Forecast) => ChartDatasetCustomTypesPerDataset[],
+	getScales: (forecast: Forecast) => ChartOptions<'line'>['scales'],
 ) {
 	const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 	const chart: Ref<Chart | null> = ref(null)
-	const hoveredDataPoint: Ref<ForecastTimeStep | null> = ref(null)
+	const hoveredDataPoint: Ref<HourlyForecast | null> = ref(null)
 
 	onMounted(() => {
 		createChart()
@@ -32,8 +32,8 @@ export function setupForecastView(
 
 	watch(() => props.forecast, () => {
 		createChart()
-		if (props.forecast.length > 0) {
-			hoveredDataPoint.value = props.forecast[0]
+		if (props.forecast.hourly.length > 0) {
+			hoveredDataPoint.value = props.forecast.hourly[0]
 		}
 	}, { immediate: true })
 
@@ -63,7 +63,7 @@ export function setupForecastView(
 				tickerPlugin,
 			],
 			data: {
-				labels: props.forecast.map((dataPoint) => dataPoint.time),
+				labels: props.forecast.hourly.map(({ time }) => time),
 				datasets: [
 					...getDatasets(props.forecast),
 				],
@@ -98,9 +98,10 @@ export function setupForecastView(
 								return false
 							}
 
-							const time = props.forecast[context.dataIndex].time.slice(0, 10)
-							const firstPointOfDayIndex = props.forecast.findIndex(dataPoint => dataPoint.time.slice(0, 10) === time)
-							const lastPointOfDayIndex = props.forecast.slice(firstPointOfDayIndex).findIndex(dataPoint => time !== dataPoint.time.slice(0, 10)) - 1
+							const refTime = props.forecast.hourly[context.dataIndex].time
+							const refTimePlusOneDay = addDays(refTime, 1)
+							const firstPointOfDayIndex = props.forecast.hourly.findIndex(({ time }) => isSameDay(time, refTime))
+							const lastPointOfDayIndex = props.forecast.hourly.slice(firstPointOfDayIndex).findIndex(({ time }) => isSameDay(time, refTimePlusOneDay)) - 1
 							const pointsForDay = context.dataset.data.slice(firstPointOfDayIndex, lastPointOfDayIndex + firstPointOfDayIndex)
 
 							const value = context.dataset.data[context.dataIndex] as number
@@ -152,13 +153,13 @@ export function setupForecastView(
 					ticker: {
 						onTick(chart, x) {
 							const timestamp = chart.scales.x.getValueForPixel(x) as number
-							const index = props.forecast.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
-							hoveredDataPoint.value = props.forecast[index - 1] ?? props.forecast[0]
+							const index = props.forecast.hourly.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
+							hoveredDataPoint.value = props.forecast.hourly[index - 1] ?? props.forecast.hourly[0]
 							debounce(emitUpdateTicker.bind(this, x), 1000)
 						},
 						onTickOut() {
 							emitUpdateTicker(-1)
-							hoveredDataPoint.value = props.forecast[0]
+							hoveredDataPoint.value = props.forecast.hourly[0]
 						},
 					},
 				},

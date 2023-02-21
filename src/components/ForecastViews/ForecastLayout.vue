@@ -2,7 +2,7 @@
 import ForecastDetails from './ForecastDetails.vue';
 
 const props = defineProps<{
-	time: string,
+	time: Date,
 }>()
 </script>
 <template>

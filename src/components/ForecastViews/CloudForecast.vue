@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ForecastTimeStep } from '@/lib/met';
+import type { Forecast } from '@/lib/open-meteo';
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 
 const props = defineProps<{
-	forecast: ForecastTimeStep[],
+	forecast: Forecast,
 	ticker: number,
 	zoom: {
 		scale: number,
@@ -16,13 +16,11 @@ const emit = defineEmits(['update:zoom', 'update:ticker'])
 
 const { hoveredDataPoint, canvas } = setupForecastView(
 	props, emit,
-	(forecast: ForecastTimeStep[]) => [
+	(forecast: Forecast) => [
 		{
 			type: 'line',
 			label: 'Cloud total',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction || 0,
-			),
+			data: forecast.hourly.map(({ cloudCover }) => cloudCover),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(0, 0, 0, 0)',
 			backgroundColor: 'rgba(0, 0, 0, 0)',
@@ -32,9 +30,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Cloud low',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction_low || 0,
-			),
+			data: forecast.hourly.map(({ cloudCoverLow }) => cloudCoverLow),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(159, 159, 163, 0.3)',
 			backgroundColor: 'rgba(159, 159, 163, 0.3)',
@@ -44,9 +40,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Cloud medium',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction_medium || 0,
-			),
+			data: forecast.hourly.map(({ cloudCoverMid }) => cloudCoverMid),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(159, 159, 163, 0.3)',
 			backgroundColor: 'rgba(159, 159, 163, 0.3)',
@@ -56,9 +50,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Cloud hight',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.instant.details?.cloud_area_fraction_high || 0,
-			),
+			data: forecast.hourly.map(({ cloudCoverHigh }) => cloudCoverHigh),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(159, 159, 163, 0.3)',
 			backgroundColor: 'rgba(159, 159, 163, 0.3)',
@@ -68,9 +60,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Cloud low',
-			data: forecast.map(
-				(dataPoint) => -(dataPoint.data.instant.details?.cloud_area_fraction_low || 0),
-			),
+			data: forecast.hourly.map(({ cloudCoverLow }) => -cloudCoverLow),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(159, 159, 163, 0.3)',
 			backgroundColor: 'rgba(159, 159, 163, 0.3)',
@@ -80,9 +70,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Cloud medium',
-			data: forecast.map(
-				(dataPoint) => -(dataPoint.data.instant.details?.cloud_area_fraction_medium || 0),
-			),
+			data: forecast.hourly.map(({ cloudCoverMid }) => -cloudCoverMid),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(159, 159, 163, 0.3)',
 			backgroundColor: 'rgba(159, 159, 163, 0.3)',
@@ -92,9 +80,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Cloud hight',
-			data: forecast.map(
-				(dataPoint) => -(dataPoint.data.instant.details?.cloud_area_fraction_high || 0),
-			),
+			data: forecast.hourly.map(({ cloudCoverHigh }) => -cloudCoverHigh),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(159, 159, 163, 0.3)',
 			backgroundColor: 'rgba(159, 159, 163, 0.3)',
@@ -105,9 +91,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			type: 'bar',
 			// TODO: use unit from response
 			label: 'Accurate rain (mm)',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.next_1_hours?.details.precipitation_amount || 0,
-			),
+			data: forecast.hourly.map(({ precipitation }) => precipitation),
 			barThickness: 5,
 			backgroundColor: 'rgba(0, 145, 205, 0.5)',
 			yAxisID: 'yr1',
@@ -116,7 +100,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		// {
 		// 	type: 'bar',
 		// 	label: 'Rain over 6h (mm)',
-		// 	data: forecast.map(dataPoint => (dataPoint.data.next_6_hours?.details.precipitation_amount || 0) / 6),
+		// 	data: forecast.hourly.map(dataPoint => (dataPoint.data.next_6_hours?.details.precipitation_amount || 0) / 6),
 		// 	backgroundColor: 'rgba(86, 160, 211, 0.8)',
 		// 	yAxisID: 'yr6',
 		// },
@@ -164,7 +148,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
 			<span class="forecast__details__couverture">Couverture</span>
-			<span>{{ hoveredDataPoint?.data.instant.details?.cloud_area_fraction }}%</span>
+			<span>{{ hoveredDataPoint.cloudCover }}{{ forecast.units.cloudCover }}</span>
 		</template>
 		<template #canvas>
 			<canvas ref="canvas"></canvas>

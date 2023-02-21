@@ -13,7 +13,7 @@ import { ref, watch, onMounted, type Ref } from 'vue'
 import Flicking, { type HoldStartEvent } from '@egjs/vue3-flicking'
 import '@egjs/vue3-flicking/dist/flicking.css'
 
-import { DataApiFp, METJSONForecast } from '@/lib/met'
+import { fetchForecast, type Forecast } from '@/lib/open-meteo/api'
 import type { City } from '@/lib/cities'
 
 import TemperatureForecast from './ForecastViews/TemperatureForecast.vue'
@@ -22,23 +22,20 @@ import PressureForecast from './ForecastViews/PressureForecast.vue'
 import WindForecast from './ForecastViews/WindForecast.vue'
 
 const props = defineProps<{ city: City }>()
-const forecast: Ref<METJSONForecast | null> = ref(null)
+const forecast: Ref<Forecast | null> = ref(null)
 const zoom = ref({
 	scale: 1,
 	offset: 0,
 })
 const ticker = ref(0)
 
-watch(() => props.city, () => fetchForecast(props.city.latitude, props.city.longitude))
+watch(() => props.city, () => _fetchForecast(props.city.latitude, props.city.longitude))
 onMounted(async () => {
-	await fetchForecast(props.city.latitude, props.city.longitude)
+	await _fetchForecast(props.city.latitude, props.city.longitude)
 })
 
-async function fetchForecast(latitude: number, longitude: number) {
-	forecast.value = await DataApiFp().completeGet(
-		latitude,
-		longitude,
-	)(fetch)
+async function _fetchForecast(latitude: number, longitude: number) {
+	forecast.value = await fetchForecast(latitude, longitude)
 }
 
 function handleHoldStart(event: HoldStartEvent) {
@@ -60,17 +57,16 @@ function handleHoldStart(event: HoldStartEvent) {
 		align: 'prev', circular: true, panelsPerView: 1, moveType: ['strict', { count: 1 }]
 	}" @holdStart="handleHoldStart">
 		<div :key="0">
-			<TemperatureForecast v-model:zoom="zoom" v-model:ticker="ticker"
-				:forecast="forecast.properties.timeseries" />
+			<TemperatureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 		<div :key="1">
-			<CloudForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast.properties.timeseries" />
+			<CloudForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 		<div :key="2">
-			<PressureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast.properties.timeseries" />
+			<PressureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 		<div :key="3">
-			<WindForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast.properties.timeseries" />
+			<WindForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 	</Flicking>
 </template>

@@ -2,17 +2,17 @@
 import { format } from 'date-fns'
 
 const props = defineProps<{
-	time: string,
+	time: Date,
 }>()
 </script>
 <template>
 	<div class="forecast__details">
 		<div>
 			<div class="forecast__details__title">
-				{{ format(new Date(props.time), 'ccc d') }}
+				{{ format(props.time, 'ccc d') }}
 			</div>
 			<div class="forecast__details__subtitle">
-				{{ format(new Date(props.time), 'p') }}
+				{{ format(props.time, 'p') }}
 			</div>
 		</div>
 		<div class="forecast__details__slots">

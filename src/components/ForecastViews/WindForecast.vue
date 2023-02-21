@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { getMax, getMin } from '@/lib/utils'
-import type { ForecastTimeStep } from '@/lib/met'
+import type { Forecast } from '@/lib/open-meteo';
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 
 const props = defineProps<{
-	forecast: ForecastTimeStep[],
+	forecast: Forecast,
 	ticker: number,
 	zoom: {
 		scale: number,
@@ -17,13 +17,11 @@ const emit = defineEmits(['update:zoom', 'update:ticker'])
 
 const { hoveredDataPoint, canvas } = setupForecastView(
 	props, emit,
-	(forecast: ForecastTimeStep[]) => [
+	(forecast: Forecast) => [
 		{
 			type: 'line',
 			label: 'Wind (Km/h)',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.instant.details?.wind_speed || 0,
-			),
+			data: forecast.hourly.map(({ windSpeed }) => windSpeed),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(48, 195, 158, 1)',
 			backgroundColor: 'rgba(48, 195, 158, 0.5)',
@@ -31,9 +29,9 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			yAxisID: 'y',
 		},
 	],
-	(forecast: ForecastTimeStep[]) => {
-		const max = getMax(forecast, dataPoint => dataPoint.data.instant.details?.wind_speed)
-		const min = getMin(forecast, dataPoint => dataPoint.data.instant.details?.wind_speed)
+	(forecast: Forecast) => {
+		const max = getMax(forecast.hourly, ({ windSpeed }) => windSpeed)
+		const min = getMin(forecast.hourly, ({ windSpeed }) => windSpeed)
 
 		return {
 			y: {
@@ -49,7 +47,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
 			<span class="forecast__details__vitesse">Vitesse</span>
-			<span>{{ hoveredDataPoint?.data.instant.details?.wind_speed }} Km/h</span>
+			<span>{{ hoveredDataPoint.windSpeed }} {{ forecast.units.windSpeed }}</span>
 		</template>
 		<template #canvas>
 			<canvas ref="canvas"></canvas>

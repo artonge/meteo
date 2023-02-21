@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ForecastTimeStep } from '@/lib/met'
+import type { Forecast } from '@/lib/open-meteo';
 import { formatNumber, getMax, getMin } from '@/lib/utils'
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 
 const props = defineProps<{
-	forecast: ForecastTimeStep[],
+	forecast: Forecast,
 	ticker: number,
 	zoom: {
 		scale: number,
@@ -17,13 +17,11 @@ const emit = defineEmits(['update:zoom', 'update:ticker'])
 
 const { hoveredDataPoint, canvas } = setupForecastView(
 	props, emit,
-	(forecast: ForecastTimeStep[]) => [
+	(forecast: Forecast) => [
 		{
 			type: 'line',
 			label: 'Temperature (°C)',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.instant.details?.air_temperature || 0,
-			),
+			data: forecast.hourly.map(({ temperature }) => temperature),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(244, 137, 36, 0.8)',
 			backgroundColor: 'rgb(255, 200, 69, 0.5)',
@@ -34,9 +32,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			type: 'bar',
 			// TODO: use unit from response
 			label: 'Rain over 1 hour (mm)',
-			data: forecast.map(
-				(dataPoint) => dataPoint.data.next_1_hours?.details.precipitation_amount || 0,
-			),
+			data: forecast.hourly.map(({ precipitation }) => precipitation),
 			barThickness: 5,
 			backgroundColor: 'rgba(0, 145, 205, 1)',
 			yAxisID: 'yr1',
@@ -44,9 +40,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Rain over 6h (mm)',
-			data: forecast.map(
-				(dataPoint) => (dataPoint.data.next_6_hours?.details.precipitation_amount || 0) / 6,
-			),
+			data: forecast.hourly.map(({ precipitation }) => precipitation / 6),
 			borderColor: 'rgba(86, 160, 211, 0.8)',
 			backgroundColor: 'rgba(196, 223, 246, 0.5)',
 			cubicInterpolationMode: 'monotone',
@@ -54,9 +48,9 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			yAxisID: 'yr6',
 		},
 	],
-	(forecast: ForecastTimeStep[]) => {
-		const max = getMax(forecast, dataPoint => dataPoint.data.instant.details?.air_temperature)
-		const min = getMin(forecast, dataPoint => dataPoint.data.instant.details?.air_temperature)
+	(forecast: Forecast) => {
+		const max = getMax(forecast.hourly, ({ temperature }) => temperature)
+		const min = getMin(forecast.hourly, ({ temperature }) => temperature)
 
 		return {
 			yt: {
@@ -83,12 +77,11 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
 			<span class="forecast__details__temperature">Temperature</span>
-			<span>{{ hoveredDataPoint?.data.instant.details?.air_temperature }}°C</span>
+			<span>{{ hoveredDataPoint.apparentTemperature }}{{ forecast.units.apparentTemperature }}</span>
 		</template>
 		<template #detail_2>
 			<span class="forecast__details__precipitation">Précipitations</span>
-			<span>{{ formatNumber(hoveredDataPoint?.data.next_6_hours?.details.precipitation_amount) }}
-				mm/h</span>
+			<span>{{ formatNumber(hoveredDataPoint.precipitation) }}{{ forecast.units.precipitation }}</span>
 		</template>
 		<template #canvas>
 			<canvas ref="canvas"></canvas>
