@@ -29,7 +29,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Pressure (hPa)',
-			data: forecast.hourly.map(({ surfacePressure }) => surfacePressure),
+			data: forecast.hourly.map(({ pressureMSL }) => pressureMSL),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(253, 92, 99, 1)',
 			backgroundColor: 'rgba(253, 92, 99, 0.2)',
@@ -38,29 +38,18 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		},
 		{
 			type: 'bar',
-			// TODO: use unit from response
-			label: 'Accurate rain (mm)',
+			label: `Precipitation over the last hour`,
 			data: forecast.hourly.map(({ precipitation }) => precipitation),
 			barThickness: 5,
 			backgroundColor: 'rgba(0, 145, 205, 0.5)',
-			yAxisID: 'yr1',
-		},
-		{
-			type: 'line',
-			label: 'Rain over 6h (mm)',
-			data: forecast.hourly.map(({ precipitation }) => (precipitation) / 6),
-			borderColor: 'rgba(86, 160, 211, 0.3)',
-			backgroundColor: 'rgba(196, 223, 246, 0.4)',
-			cubicInterpolationMode: 'monotone',
-			fill: 'origin',
-			yAxisID: 'yr6',
+			yAxisID: 'ypr',
 		},
 	],
 	(forecast: Forecast) => {
 		const minHumidity = getMin(forecast.hourly, ({ relativeHumidity }) => relativeHumidity)
 		const maxHumidity = getMax(forecast.hourly, ({ relativeHumidity }) => relativeHumidity)
-		const maxPressure = getMax(forecast.hourly, ({ surfacePressure }) => surfacePressure)
-		const minPressure = getMin(forecast.hourly, ({ surfacePressure }) => surfacePressure)
+		const maxPressure = getMax(forecast.hourly, ({ pressureMSL }) => pressureMSL)
+		const minPressure = getMin(forecast.hourly, ({ pressureMSL }) => pressureMSL)
 
 		return {
 			yh: {
@@ -75,13 +64,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 				max: maxPressure + 50,
 				min: minPressure - 20,
 			},
-			yr1: {
-				display: false,
-				position: 'right',
-				max: 4,
-				beginAtZero: true,
-			},
-			yr6: {
+			ypr: {
 				display: false,
 				position: 'right',
 				max: 4,
@@ -99,7 +82,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		</template>
 		<template #detail_2>
 			<span class="forecast__details__pressure">Pression</span>
-			<span>{{ formatNumber(hoveredDataPoint.surfacePressure) }}{{ forecast.units.surfacePressure }}</span>
+			<span>{{ formatNumber(hoveredDataPoint.pressureMSL) }}{{ forecast.units.pressureMSL }}</span>
 		</template>
 		<template #canvas>
 			<canvas ref="canvas"></canvas>

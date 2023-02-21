@@ -20,7 +20,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	(forecast: Forecast) => [
 		{
 			type: 'line',
-			label: 'Temperature (°C)',
+			label: 'Temperature',
 			data: forecast.hourly.map(({ temperature }) => temperature),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(244, 137, 36, 0.8)',
@@ -30,22 +30,11 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		},
 		{
 			type: 'bar',
-			// TODO: use unit from response
-			label: 'Rain over 1 hour (mm)',
+			label: `Precipitation over the last hour`,
 			data: forecast.hourly.map(({ precipitation }) => precipitation),
 			barThickness: 5,
 			backgroundColor: 'rgba(0, 145, 205, 1)',
-			yAxisID: 'yr1',
-		},
-		{
-			type: 'line',
-			label: 'Rain over 6h (mm)',
-			data: forecast.hourly.map(({ precipitation }) => precipitation / 6),
-			borderColor: 'rgba(86, 160, 211, 0.8)',
-			backgroundColor: 'rgba(196, 223, 246, 0.5)',
-			cubicInterpolationMode: 'monotone',
-			fill: 'origin',
-			yAxisID: 'yr6',
+			yAxisID: 'yp',
 		},
 	],
 	(forecast: Forecast) => {
@@ -59,12 +48,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 				min: min - (max - min) * 2,
 				beginAtZero: true,
 			},
-			yr1: {
-				display: false,
-				max: 4,
-				beginAtZero: true,
-			},
-			yr6: {
+			yp: {
 				display: false,
 				max: 4,
 				beginAtZero: true,

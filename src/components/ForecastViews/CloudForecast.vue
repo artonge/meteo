@@ -89,21 +89,12 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		},
 		{
 			type: 'bar',
-			// TODO: use unit from response
-			label: 'Accurate rain (mm)',
+			label: `Precipitation over the last hour`,
 			data: forecast.hourly.map(({ precipitation }) => precipitation),
 			barThickness: 5,
 			backgroundColor: 'rgba(0, 145, 205, 0.5)',
-			yAxisID: 'yr1',
+			yAxisID: 'yp',
 		},
-		// TODO: show in better way
-		// {
-		// 	type: 'bar',
-		// 	label: 'Rain over 6h (mm)',
-		// 	data: forecast.hourly.map(dataPoint => (dataPoint.data.next_6_hours?.details.precipitation_amount || 0) / 6),
-		// 	backgroundColor: 'rgba(86, 160, 211, 0.8)',
-		// 	yAxisID: 'yr6',
-		// },
 	],
 	() => {
 		return {
@@ -128,13 +119,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 				beginAtZero: true,
 				stacked: true,
 			},
-			yr1: {
-				display: false,
-				position: 'right',
-				max: 10,
-				beginAtZero: true,
-			},
-			yr6: {
+			yp: {
 				display: false,
 				position: 'right',
 				max: 4,

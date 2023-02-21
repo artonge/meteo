@@ -18,7 +18,7 @@ export interface HourlyForecast {
 	cloudCoverHigh: number
 	windSpeed: number
 	windDirection: number
-	surfacePressure: number
+	pressureMSL: number
 }
 
 export interface DailyForecast {
@@ -38,7 +38,7 @@ export interface Units {
 	cloudCoverHigh: '%'
 	windSpeed: 'km/h'
 	windDirection: '°'
-	surfacePressure: 'hPa'
+	pressureMSL: 'hPa'
 }
 
 export interface Forecast {

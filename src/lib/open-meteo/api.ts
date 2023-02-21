@@ -15,7 +15,7 @@ const hourlyParams = [
 	'cloudcover_high',
 	'windspeed_10m',
 	'winddirection_10m',
-	'surface_pressure',
+	'pressure_msl',
 ]
 
 const dailyParams = [
@@ -45,7 +45,7 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 				cloudCoverHigh: forecast.hourly.cloudcover_high[index],
 				windSpeed: forecast.hourly.windspeed_10m[index],
 				windDirection: forecast.hourly.winddirection_10m[index],
-				surfacePressure: forecast.hourly.surface_pressure[index],
+				pressureMSL: forecast.hourly.pressure_msl[index],
 			}
 		}),
 		daily: forecast.daily.time.map((timestamp: number, index: number) => {
@@ -66,7 +66,7 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 			cloudCoverHigh: forecast.hourly_units.cloudcover_high,
 			windSpeed: forecast.hourly_units.windspeed_10m,
 			windDirection: forecast.hourly_units.winddirection_10m,
-			surfacePressure: forecast.hourly_units.surface_pressure,
+			pressureMSL: forecast.hourly_units.pressure_msl,
 		}
 	}
 }
