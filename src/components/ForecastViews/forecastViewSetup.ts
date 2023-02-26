@@ -1,5 +1,5 @@
 import { ref, watch, onMounted, type Ref } from 'vue'
-import { format, isAfter, isSameDay } from 'date-fns'
+import { isAfter, isSameDay } from 'date-fns'
 import 'chartjs-adapter-date-fns'
 import { Chart, PointElement, TimeScale, LinearScale, BarController, BarElement, LineController, LineElement, Filler } from 'chart.js'
 import type { ChartDatasetCustomTypesPerDataset, ChartOptions, Point, ParsingOptions } from 'chart.js'
@@ -188,9 +188,11 @@ export function setupForecastView(
 						type: 'time',
 						time: {
 							unit: 'day',
+							displayFormats: {
+								day: 'ccc'
+							},
 						},
 						ticks: {
-							callback: (val) => format(new Date(val), 'ccc'),
 							align: 'start',
 							sampleSize: 1,
 							font: {
