@@ -197,6 +197,10 @@ export function setupForecastView(
 								size: 16,
 							},
 						},
+						// Prevent padding due to last tick label
+						afterFit(axis) {
+							axis.paddingRight = 0;
+						},
 						grid: {
 							color: 'rgba(68, 76, 86)',
 							offset: false,
