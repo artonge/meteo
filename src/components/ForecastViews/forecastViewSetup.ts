@@ -1,13 +1,25 @@
 import { ref, watch, onMounted, type Ref } from 'vue'
-import { format, isAfter, isSameDay, addDays } from 'date-fns'
+import { format, isAfter, isSameDay } from 'date-fns'
 import 'chartjs-adapter-date-fns'
-import { Chart, type ChartDatasetCustomTypesPerDataset, type ChartOptions } from 'chart.js/auto'
+import { Chart, PointElement, TimeScale, LinearScale, BarController, BarElement, LineController, LineElement, Filler } from 'chart.js'
+import type { ChartDatasetCustomTypesPerDataset, ChartOptions, Point, ParsingOptions } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import zoomPlugin from 'chartjs-plugin-zoom'
 import type { Forecast, HourlyForecast } from '@/lib/open-meteo';
 import { computedPanOffset } from '@/lib/utils'
 import { tickerPlugin } from '@/plugins/ticker'
 import { debounce } from 'debounce'
+
+Chart.register(
+	Filler,
+	LineController,
+	LineElement,
+	PointElement,
+	BarController,
+	BarElement,
+	TimeScale,
+	LinearScale,
+)
 
 export function setupForecastView(
 	props: Readonly<{
@@ -65,7 +77,15 @@ export function setupForecastView(
 			data: {
 				labels: props.forecast.hourly.map(({ time }) => time),
 				datasets: [
-					...getDatasets(props.forecast),
+					...getDatasets(props.forecast)
+						.map(dataset => {
+							return {
+								...dataset,
+								...{parsing: false} as ParsingOptions,
+								normalized: true,
+								data: dataset.data.map((y, i) => ({x: props.forecast.hourly[i].time, y})),
+							}
+						}),
 				],
 			},
 			options: {
@@ -75,6 +95,7 @@ export function setupForecastView(
 				elements: {
 					point: {
 						pointStyle: false,
+						radius: 0,
 					},
 				},
 				plugins: {
@@ -87,6 +108,7 @@ export function setupForecastView(
 					datalabels: {
 						color: 'gray',
 						align: 'top',
+						formatter: value => value.y,
 						display: function (context) {
 							// Only show label for the first dataset.
 							if (context.datasetIndex !== 0) {
@@ -98,17 +120,15 @@ export function setupForecastView(
 								return false
 							}
 
-							const refTime = props.forecast.hourly[context.dataIndex].time
-							const refTimePlusOneDay = addDays(refTime, 1)
-							const firstPointOfDayIndex = props.forecast.hourly.findIndex(({ time }) => isSameDay(time, refTime))
-							const lastPointOfDayIndex = props.forecast.hourly.slice(firstPointOfDayIndex).findIndex(({ time }) => isSameDay(time, refTimePlusOneDay)) - 1
-							const pointsForDay = context.dataset.data.slice(firstPointOfDayIndex, lastPointOfDayIndex + firstPointOfDayIndex)
+							const {x: time, y: value} = (context.dataset.data[context.dataIndex] as Point)
+							const pointsForDay = (context.dataset.data as Point[]).filter(p => isSameDay(p.x, time))
+							const valuesForDay = pointsForDay.map(p => p.y)
+							const currentIndex = pointsForDay.findIndex(p => (p as Point).x === time)
 
-							const value = context.dataset.data[context.dataIndex] as number
-							const isHightest = !pointsForDay.some(dataPointValue => (dataPointValue as number) > value)
-							const isLowest = !pointsForDay.some(dataPointValue => (dataPointValue as number) < value)
-							const isUniq = pointsForDay.filter(dataPointValue => (dataPointValue as number) === value).length === 1
-							const isFirst = pointsForDay.findIndex(dataPointValue => (dataPointValue as number) === value) + firstPointOfDayIndex === context.dataIndex
+							const isHightest = !valuesForDay.some(dataPointValue => dataPointValue > value)
+							const isLowest = !valuesForDay.some(dataPointValue => dataPointValue < value)
+							const isUniq = valuesForDay.filter(dataPointValue => dataPointValue === value).length === 1
+							const isFirst = valuesForDay.findIndex(dataPointValue => dataPointValue === value) === currentIndex
 
 							return (isHightest || isLowest) && (isUniq || isFirst)
 						},
@@ -172,6 +192,7 @@ export function setupForecastView(
 						ticks: {
 							callback: (val) => format(new Date(val), 'ccc'),
 							align: 'start',
+							sampleSize: 1,
 							font: {
 								size: 16,
 							},

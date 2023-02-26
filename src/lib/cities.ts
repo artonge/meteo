@@ -55,8 +55,12 @@ export async function fetchCities() {
 	console.log('City DB populated')
 }
 
+interface RealFuseIndex<T> extends Fuse.FuseIndex<T> {
+	size(): number
+}
+
 export function isCitiesIndexLoaded(): boolean {
-	return citiesFuse.getIndex().size() !== 0
+	return (citiesFuse.getIndex() as RealFuseIndex<City>).size() !== 0
 }
 
 export async function createCitiesIndex() {
@@ -66,7 +70,7 @@ export async function createCitiesIndex() {
 
 	console.log('Creating city index with', await citiesDb.cities.toArray(), 'cities')
 	citiesFuse.setCollection(await citiesDb.cities.toArray())
-	console.log('City index created with', citiesFuse.getIndex().size(), 'cities')
+	console.log('City index created with', (citiesFuse.getIndex() as RealFuseIndex<City>).size(), 'cities')
 }
 
 export function searchCities(searchQuery: string): City[] {

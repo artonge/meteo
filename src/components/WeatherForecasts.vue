@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // TODO: Improve disabled state style of header input
 // TODO: Improve loading state style of geolocation button
-// TODO  Add sub zero differentiator
+// TODO: Add sub zero differentiator
 // TODO: Fix edge detection for panning
 // TODO: Increase discoverability of other panels
 // TODO: Fix ticker freeze
