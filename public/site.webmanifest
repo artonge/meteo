@@ -1,0 +1,15 @@
+{
+    "name": "meteo",
+    "short_name": "meteo",
+    "icons": [
+        {
+            "src": "/android-chrome-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#2d333b",
+    "background_color": "#2d333b",
+    "start_url": "https://meteo.chmn.me",
+    "display": "standalone"
+}
