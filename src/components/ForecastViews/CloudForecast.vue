@@ -91,7 +91,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			type: 'bar',
 			label: `Precipitation over the last hour`,
 			data: forecast.hourly.map(({ precipitation }) => precipitation),
-			barThickness: 5,
+			barThickness: 'flex',
 			backgroundColor: 'rgba(0, 145, 205, 0.5)',
 			yAxisID: 'yp',
 		},
