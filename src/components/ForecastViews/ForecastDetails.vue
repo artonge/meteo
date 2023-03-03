@@ -59,7 +59,7 @@ const props = defineProps<{
 
 			& span:first-child {
 				text-align: right;
-				width: 150px;
+				width: 200px;
 				margin-right: 8px;
 			}
 		}
