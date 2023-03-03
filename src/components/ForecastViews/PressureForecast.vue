@@ -67,7 +67,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			ypr: {
 				display: false,
 				position: 'right',
-				max: 4,
+				max: 8,
 				beginAtZero: true,
 			},
 		}
