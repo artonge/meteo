@@ -1,9 +1,9 @@
 @import './base.css';
 
 #app {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 @media (min-width: 1024px) {

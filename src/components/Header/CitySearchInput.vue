@@ -11,6 +11,7 @@ import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
 import { createCitiesIndex, fetchCities, isCitiesIndexLoaded, searchCities, type City } from '@/lib/cities'
+import Deselect from './Deselect.vue'
 
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
 
@@ -110,10 +111,13 @@ function handleGeolocationRequest() {
 <template>
 	<div class="location-input">
 		<v-select class="city-select" :options="foundCities" :filterable="false" v-model="selectedCity"
-			:disabled="initialLoading" placeholder="Search a city name. Ex: Paris" :loading="loading"
-			@open="handleSelectOpen" @search="debouncedSearchCity"
+			:components="{ Deselect }" :disabled="initialLoading" placeholder="Search a city name. Ex: Paris"
+			:loading="loading" @open="handleSelectOpen" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
 			<template #no-options> Type to search a city</template>
+			<template #spinner="{ loading }">
+				<svg-icon v-if="loading" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
+			</template>
 		</v-select>
 		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest">
 			<svg-icon v-if="loadingCurrentLocation" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
@@ -125,82 +129,88 @@ function handleGeolocationRequest() {
 .location-input {
 	display: flex;
 	width: 100%;
-	background-color: var(--color-background-ternary);
-	border-radius: 6px;
 
-	.v-select {
+	:deep(.v-select) {
 		flex-grow: 1;
 		width: 0;
 
-		:deep(.vs__search) {
-			height: 60px;
-			font-size: 24px;
-			margin-top: 6px;
-			color: var(--color-text);
-		}
-
-		:deep(.vs__selected-options) {
-			width: calc(100% - 30px);
-		}
-
-		:deep(.vs__selected) {
-			font-size: 24px;
-			color: var(--color-primary);
-			width: calc(100% - 20px);
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-
 		&.vs--open,
 		&.vs--loading {
-			:deep(.vs__selected) {
+			.vs__selected {
 				top: 50%;
 				margin-top: -16px;
 			}
 		}
 
-		:deep(.vs__actions) {
-			margin-right: 4px;
+		&.vs--loading .vs__clear {
+			display: none;
+		}
 
-			.vs__clear {
-				scale: 1.5;
-				fill: var(--color-text);
-			}
+		&.vs--open .vs__dropdown-toggle {
+			border-radius: 6px 0px 0px 0px;
+			border: 2px solid var(--color-primary);
+		}
 
-			.vs__open-indicator {
-				display: none;
+		&:not(.vs--open) .vs__dropdown-toggle {
+			transition: border-radius 250ms;
+		}
+
+		.vs__dropdown-toggle {
+			border: 2px solid var(--color-grey);
+			border-radius: 6px 0px 0px 6px;
+			background-color: var(--color-background-ternary);
+
+			.vs__search {
+				height: 60px;
+				font-size: 24px;
+				margin-top: 6px;
 				color: var(--color-text);
 			}
 
-			.vs__spinner {
-				border-top-color: var(--color-border);
-				border-right-color: var(--color-border);
-				border-bottom-color: var(--color-border);
-				border-left-color: var(--color-text);
+			.vs__selected-options {
+				width: calc(100% - 30px);
+
+				.vs__selected {
+					font-size: 24px;
+					color: var(--color-primary-contrasted);
+					width: calc(100% - 20px);
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
 			}
+
+			.vs__actions {
+				margin-right: 4px;
+
+				.vs__clear {}
+
+				.vs__open-indicator {
+					display: none;
+					color: var(--color-text);
+				}
+			}
+
 		}
 
-		&.vs--loading {
-			:deep(.vs__clear) {
-				display: none;
-			}
-		}
-
-		:deep(.vs__dropdown-menu) {
+		.vs__dropdown-menu {
 			background-color: var(--color-background-ternary);
 			padding: 20px 8px;
+			border: 2px solid var(--color-primary);
+			border-top: 0px;
+			margin-top: -2px;
 
 			.vs__dropdown-option {
 				font-size: 20px;
 				border-radius: 8px;
 				padding: 4px 8px;
 				border: 2px solid transparent;
-			}
 
-			.vs__dropdown-option--highlight {
-				border: 2px solid var(--color-primary);
-				background-color: var(--color-primary-transparent);
+				&--highlight {
+					border: 2px solid var(--color-primary);
+					background-color: var(--color-primary-transparent);
+					color: var(--color-text);
+				}
 			}
 		}
 	}
@@ -208,10 +218,13 @@ function handleGeolocationRequest() {
 	.geolocation-button {
 		width: 72px;
 		flex-shrink: 0;
+		border: 2px solid var(--color-grey);
+		border-radius: 0px 6px 6px 0px;
+		border-left: none;
+	}
 
-		.loading {
-			animation: vSelectSpinner 1.1s infinite linear;
-		}
+	.loading {
+		animation: vSelectSpinner 1.1s infinite linear;
 	}
 }
 </style>
