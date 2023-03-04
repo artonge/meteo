@@ -27,7 +27,8 @@ export function setupForecastView(
 		ticker: number;
 		zoom: {
 			scale: number;
-			offset: number;
+			min: number;
+			max: number;
 		};
 	}>,
 	emit: (event: "update:zoom" | "update:ticker", ...args: any[]) => void,
@@ -64,11 +65,33 @@ export function setupForecastView(
 		})
 	})
 
-	function emitUpdateTicker(x: number): void {
-		emit('update:ticker', x)
-	}
+	watch(() => props.zoom, (zoomValue) => {
+		if (canvas.value?.getBoundingClientRect().x === 0) {
+			return
+		}
 
+		setTimeout(() => {
+			if (chart.value === null) {
+				throw new Error('Chart should not be null')
+			}
+
+			const xScale = chart.value.scales[chart.value.getDatasetMeta(0).xAxisID as string]
+			chart.value.resetZoom()
+			chart.value.zoom({ x: zoomValue.scale })
+			chart.value.pan({ x: xScale.getPixelForValue(chart.value.scales.x.min) - xScale.getPixelForValue(zoomValue.min) })
+		})
+	})
+
+	function emitUpdateTicker(x: number): void { emit('update:ticker', x) }
 	const debouncedEmitUpdateTicker = debounce(emitUpdateTicker, 100)
+
+	const debouncedEmitUpdateZoom = debounce(function emitUpdateZoom(zoom: typeof props.zoom): void {
+		if (canvas.value?.getBoundingClientRect().x !== 0) {
+			return
+		}
+
+		emit('update:zoom', zoom)
+	}, 100)
 
 	function updateHoveredDataPoint(chart: Chart, x: number) {
 		const timestamp = chart.scales.x.getValueForPixel(x) as number
@@ -153,13 +176,42 @@ export function setupForecastView(
 							mode: 'x',
 							scaleMode: 'x',
 							// Do not pan when not zoomed or when at the edge of the chart.
-							onPanStart({ chart }) {
-								return chart.getZoomLevel() !== 1 && computedPanOffset(chart) !== 0 && computedPanOffset(chart) !== 1
+							onPanStart({ chart, event }) {
+								if (chart.getZoomLevel() === 1) {
+									return false
+								}
+
+								const direction = (event as any).direction as number
+
+								console.log('pan start', {
+									...props.zoom,
+									dataMin: props.forecast?.hourly[0].time.getTime(),
+									dataMax: props.forecast?.hourly[props.forecast.hourly.length - 1].time.getTime(),
+									direction: direction,
+								})
+
+								if (direction !== 2 && direction !== 4) {
+									console.log("abort pan")
+									return false
+								}
+
+								if (props.zoom.min === props.forecast.hourly[0].time.getTime() && direction !== 2) {
+									console.log("abort pan")
+									return false
+								}
+
+								if (props.zoom.max === props.forecast.hourly[props.forecast.hourly.length - 1].time.getTime() && direction !== 4) {
+									console.log("abort pan")
+									return false
+								}
+
+								return true
 							},
 							onPan({ chart }) {
-								emit('update:zoom', {
+								debouncedEmitUpdateZoom({
 									scale: chart.getZoomLevel(),
-									offset: computedPanOffset(chart),
+									min: chart.scales.x.min,
+									max: chart.scales.x.max,
 								})
 							},
 						},
@@ -172,9 +224,10 @@ export function setupForecastView(
 								enabled: true
 							},
 							onZoom({ chart }) {
-								emit('update:zoom', {
+								debouncedEmitUpdateZoom({
 									scale: chart.getZoomLevel(),
-									offset: computedPanOffset(chart),
+									min: chart.scales.x.min,
+									max: chart.scales.x.max,
 								})
 							}
 						},

@@ -8,7 +8,8 @@ const props = defineProps<{
 	ticker: number,
 	zoom: {
 		scale: number,
-		offset: number,
+		min: number,
+		max: number,
 	},
 }>()
 
