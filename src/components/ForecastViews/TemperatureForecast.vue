@@ -17,26 +17,45 @@ const emit = defineEmits(['update:zoom', 'update:ticker'])
 
 const { hoveredDataPoint, canvas } = setupForecastView(
 	props, emit,
-	(forecast: Forecast) => [
-		{
-			type: 'line',
-			label: 'Temperature',
-			data: forecast.hourly.map(({ temperature }) => temperature),
-			cubicInterpolationMode: 'monotone',
-			borderColor: 'rgb(244, 137, 36, 0.8)',
-			backgroundColor: 'rgba(255, 200, 69, 0.2)',
-			fill: "start",
-			yAxisID: 'yt',
-		},
-		{
-			type: 'bar',
-			label: `Precipitation over the last hour`,
-			data: forecast.hourly.map(({ precipitation }) => precipitation),
-			barThickness: 'flex',
-			backgroundColor: 'rgba(0, 145, 205, 0.7)',
-			yAxisID: 'yp',
-		},
-	],
+	(forecast: Forecast) => {
+		const hasSubZeroTemperatures = forecast.hourly.some(({ temperature }) => temperature <= 0)
+
+		return [
+			{
+				type: 'line',
+				label: 'Sub zero temperatures',
+				data: hasSubZeroTemperatures ? forecast.hourly.map(({ temperature }) => temperature < 0 ? temperature : 0) : [],
+				borderColor: 'rgba(3, 126, 243, 0.8)',
+				backgroundColor: 'rgba(3, 126, 243, 0.2)',
+				fill: "start",
+				yAxisID: 'yt',
+				datalabels: {
+					display: false,
+				}
+			},
+			{
+				type: 'line',
+				label: 'Temperature',
+				data: forecast.hourly.map(({ temperature }) => temperature),
+				cubicInterpolationMode: 'monotone',
+				borderColor: 'rgb(244, 137, 36, 0.8)',
+				backgroundColor: 'rgba(255, 200, 69, 0.2)',
+				fill: "start",
+				yAxisID: 'yt',
+			},
+			{
+				type: 'bar',
+				label: `Precipitation over the last hour`,
+				data: forecast.hourly.map(({ precipitation }) => precipitation),
+				barThickness: 'flex',
+				backgroundColor: 'rgba(0, 145, 205, 0.7)',
+				yAxisID: 'yp',
+				datalabels: {
+					display: false,
+				}
+			},
+		]
+	},
 	(forecast: Forecast) => {
 		const max = getMax(forecast.hourly, ({ temperature }) => temperature)
 		const min = getMin(forecast.hourly, ({ temperature }) => temperature)
@@ -44,8 +63,8 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		return {
 			yt: {
 				display: false,
-				max: max + (max - min) * 2,
-				min: min - (max - min) * 2,
+				suggestedMax: max + (max - min) * 2 + (20 - max),
+				suggestedMin: min - (max - min) * 2,
 				beginAtZero: true,
 			},
 			yp: {

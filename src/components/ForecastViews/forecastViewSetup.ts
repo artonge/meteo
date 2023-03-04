@@ -71,9 +71,9 @@ export function setupForecastView(
 	const debouncedEmitUpdateTicker = debounce(emitUpdateTicker, 100)
 
 	function updateHoveredDataPoint(chart: Chart, x: number) {
-			const timestamp = chart.scales.x.getValueForPixel(x) as number
-			const index = props.forecast.hourly.findIndex(dataPoint => dataPoint.time.getTime() > timestamp)
-			hoveredDataPoint.value = props.forecast.hourly[index - 1] ?? props.forecast.hourly[0]
+		const timestamp = chart.scales.x.getValueForPixel(x) as number
+		const index = props.forecast.hourly.findIndex(dataPoint => dataPoint.time.getTime() > timestamp)
+		hoveredDataPoint.value = props.forecast.hourly[index - 1] ?? props.forecast.hourly[0]
 	}
 
 	function createChart() {
@@ -98,9 +98,9 @@ export function setupForecastView(
 						.map(dataset => {
 							return {
 								...dataset,
-								...{parsing: false} as ParsingOptions,
+								...{ parsing: false } as ParsingOptions,
 								normalized: true,
-								data: dataset.data.map((y, i) => ({x: props.forecast.hourly[i].time.getTime(), y})),
+								data: dataset.data.map((y, i) => ({ x: props.forecast.hourly[i].time.getTime(), y })),
 							}
 						}),
 				],
@@ -127,20 +127,15 @@ export function setupForecastView(
 						align: 'top',
 						formatter: value => value.y.toString(),
 						display(context) {
-							// Only show label for the first dataset.
-							if (context.datasetIndex !== 0) {
-								return false
-							}
-
 							// Do no show label for the first data point.
 							if (context.dataIndex === 0) {
 								return false
 							}
 
-							const {x: time, y: value} = (context.dataset.data[context.dataIndex] as Point)
+							const { x: time, y: value } = (context.dataset.data[context.dataIndex] as Point)
 							const start = startOfDay(time).getTime()
-							const end = start + 1000*60*60*24
-							const pointsForDay = (context.dataset.data as Point[]).filter(({x}) => start < x && x <= end)
+							const end = start + 1000 * 60 * 60 * 24
+							const pointsForDay = (context.dataset.data as Point[]).filter(({ x }) => start < x && x <= end)
 							const valuesForDay = pointsForDay.map(p => p.y)
 							const currentIndex = pointsForDay.findIndex(p => (p as Point).x === time)
 

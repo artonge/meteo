@@ -43,6 +43,9 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			barThickness: 'flex',
 			backgroundColor: 'rgba(0, 145, 205, 0.7)',
 			yAxisID: 'ypr',
+			datalabels: {
+				display: false,
+			},
 		},
 	],
 	(forecast: Forecast) => {
