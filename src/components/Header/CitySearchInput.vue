@@ -104,6 +104,7 @@ watch(coords, () => {
 
 watch(coordsError, () => {
 	loadingCurrentLocation.value = false
+	pause()
 	alert(coordsError.value?.message)
 })
 
