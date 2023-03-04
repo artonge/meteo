@@ -186,6 +186,7 @@ function handleGeolocationRequest() {
 
 			.vs__actions {
 				margin-right: 4px;
+				padding-top: 0;
 
 				.vs__clear {
 					height: 24px;
