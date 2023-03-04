@@ -20,7 +20,7 @@ const loading = ref(false)
 const selectedCity: Ref<City | null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
 const foundCities: Ref<City[]> = ref([])
 const loadingCurrentLocation = ref(false)
-const { coords, resume, pause, isSupported } = useGeolocation({ immediate: false })
+const { coords, resume, pause, isSupported, error: coordsError } = useGeolocation({ immediate: false })
 
 if (selectedCity.value !== null) {
 	if (selectedCity.value.name === 'Current location') {
@@ -102,6 +102,11 @@ watch(coords, () => {
 	}
 })
 
+watch(coordsError, () => {
+	loadingCurrentLocation.value = false
+	alert(coordsError.value?.message)
+})
+
 function handleGeolocationRequest() {
 	console.debug('Requesting geolocation')
 	resume()
@@ -134,14 +139,6 @@ function handleGeolocationRequest() {
 		flex-grow: 1;
 		width: 0;
 
-		&.vs--open,
-		&.vs--loading {
-			.vs__selected {
-				top: 50%;
-				margin-top: -16px;
-			}
-		}
-
 		&.vs--loading .vs__clear {
 			display: none;
 		}
@@ -159,19 +156,26 @@ function handleGeolocationRequest() {
 			border: 2px solid var(--color-border);
 			border-radius: 6px 0px 0px 6px;
 			background-color: var(--color-background-ternary);
-
-			.vs__search {
-				height: 60px;
-				font-size: 24px;
-				margin-top: 6px;
-				color: var(--color-text);
-			}
+			padding-bottom: 0;
 
 			.vs__selected-options {
 				width: calc(100% - 30px);
+				align-items: center;
+				height: 60px;
+
+				.vs__search,
+				.vs__selected {
+					margin-top: 0;
+					font-size: 24px;
+
+				}
+
+				.vs__search {
+					color: var(--color-text);
+				}
+
 
 				.vs__selected {
-					font-size: 24px;
 					color: var(--color-primary-contrasted);
 					width: calc(100% - 20px);
 					white-space: nowrap;
@@ -183,14 +187,15 @@ function handleGeolocationRequest() {
 			.vs__actions {
 				margin-right: 4px;
 
-				.vs__clear {}
+				.vs__clear {
+					height: 24px;
+				}
 
 				.vs__open-indicator {
 					display: none;
 					color: var(--color-text);
 				}
 			}
-
 		}
 
 		.vs__dropdown-menu {
@@ -198,7 +203,7 @@ function handleGeolocationRequest() {
 			padding: 20px 8px;
 			border: 2px solid var(--color-primary);
 			border-top: 0px;
-			margin-top: -2px;
+			margin-top: 1px;
 
 			.vs__dropdown-option {
 				font-size: 20px;
@@ -221,6 +226,9 @@ function handleGeolocationRequest() {
 		border: 2px solid var(--color-border);
 		border-radius: 0px 6px 6px 0px;
 		border-left: none;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.loading {
