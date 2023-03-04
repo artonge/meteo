@@ -11,7 +11,8 @@
 	--color-primary-contrasted: #e7be19;
 	--color-primary-transparent: rgba(255, 204, 0, 0.2);
 
-	--color-grey: #4e535c;
+	--color-pale-grey: #dfdfdf;
+	--color-dark-grey: #444c56;
 }
 
 /* semantic color variables for this project */
@@ -20,7 +21,7 @@
 	--color-background-secondary: var(--color-white-soft);
 	--color-background-ternary: var(--color-white-contrasted);
 
-	--color-border: var(--color-grey);
+	--color-border: var(--color-pale-grey);
 
 	--color-text: var(--color-black-contrasted);
 	--color-text-inverted: var(--color-white-contrasted);
@@ -32,7 +33,7 @@
 		--color-background-secondary: var(--color-black-soft);
 		--color-background-ternary: var(--color-black-contrasted);
 
-		--color-border: var(--color-grey);
+		--color-border: var(--color-dark-grey);
 
 		--color-text: var(--color-white-contrasted);
 		--color-text-inverted: var(--color-black-contrasted);

@@ -156,7 +156,7 @@ function handleGeolocationRequest() {
 		}
 
 		.vs__dropdown-toggle {
-			border: 2px solid var(--color-grey);
+			border: 2px solid var(--color-border);
 			border-radius: 6px 0px 0px 6px;
 			background-color: var(--color-background-ternary);
 
@@ -218,7 +218,7 @@ function handleGeolocationRequest() {
 	.geolocation-button {
 		width: 72px;
 		flex-shrink: 0;
-		border: 2px solid var(--color-grey);
+		border: 2px solid var(--color-border);
 		border-radius: 0px 6px 6px 0px;
 		border-left: none;
 	}

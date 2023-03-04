@@ -24,7 +24,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			data: forecast.hourly.map(({ windSpeed }) => windSpeed),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(48, 195, 158, 0.8)',
-			backgroundColor: 'rgba(48, 195, 158, 0.1)',
+			backgroundColor: 'rgba(48, 195, 158, 0.3)',
 			fill: 'origin',
 			yAxisID: 'y',
 		},

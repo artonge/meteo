@@ -32,7 +32,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			data: forecast.hourly.map(({ pressureMSL }) => pressureMSL),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(253, 92, 99, 0.8)',
-			backgroundColor: 'rgba(253, 92, 99, 0.1)',
+			backgroundColor: 'rgba(253, 92, 99, 0.3)',
 			fill: 'origin',
 			yAxisID: 'yp',
 		},

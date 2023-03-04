@@ -24,7 +24,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			data: forecast.hourly.map(({ temperature }) => temperature),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgb(255, 200, 69, 0.8)',
-			backgroundColor: 'rgba(244, 137, 36, 0.1)',
+			backgroundColor: 'rgba(244, 137, 36, 0.3)',
 			fill: "start",
 			yAxisID: 'yt',
 		},
@@ -61,7 +61,8 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
 			<span class="forecast__details__temperature">Temperature (ressentie)</span>
-			<span>{{ hoveredDataPoint.temperature }}{{ forecast.units.temperature }} ({{ hoveredDataPoint.apparentTemperature }}{{ forecast.units.apparentTemperature }})</span>
+			<span>{{ hoveredDataPoint.temperature }}{{ forecast.units.temperature }} ({{
+				hoveredDataPoint.apparentTemperature }}{{ forecast.units.apparentTemperature }})</span>
 		</template>
 		<template #detail_2>
 			<span class="forecast__details__precipitation">Précipitations</span>
