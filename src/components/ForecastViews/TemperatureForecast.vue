@@ -61,8 +61,8 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
 			<span class="forecast__details__temperature">Temperature (ressentie)</span>
-			<span>{{ hoveredDataPoint.temperature }}{{ forecast.units.temperature }} ({{
-				hoveredDataPoint.apparentTemperature }}{{ forecast.units.apparentTemperature }})</span>
+			<span>{{ formatNumber(hoveredDataPoint.temperature) }}{{ forecast.units.temperature }} ({{
+				formatNumber(hoveredDataPoint.apparentTemperature) }}{{ forecast.units.apparentTemperature }})</span>
 		</template>
 		<template #detail_2>
 			<span class="forecast__details__precipitation">Précipitations</span>
