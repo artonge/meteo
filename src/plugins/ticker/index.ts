@@ -56,13 +56,13 @@ function drawTraceLine(chart: Chart, x: number) {
 	const yScale = chart.scales[chart.getDatasetMeta(0).yAxisID as string]
 
 	chart.draw()
-	chart.ctx.beginPath();
-	chart.ctx.moveTo(x, yScale.getPixelForValue(yScale.max));
-	chart.ctx.lineWidth = getOption(chart, 'width') as number;
-	chart.ctx.strokeStyle = getOption(chart, 'color') as string;
-	chart.ctx.lineTo(x, chart.scales.x.bottom);
-	chart.ctx.stroke();
-	chart.ctx.setLineDash([]);
+	chart.ctx.beginPath()
+	chart.ctx.moveTo(x, yScale.getPixelForValue(yScale.max))
+	chart.ctx.lineWidth = getOption(chart, 'width') as number
+	chart.ctx.strokeStyle = getOption(chart, 'color') as string
+	chart.ctx.lineTo(x, chart.scales.x.bottom)
+	chart.ctx.stroke()
+	chart.ctx.setLineDash([])
 }
 
 export const tickerPlugin: Plugin = {

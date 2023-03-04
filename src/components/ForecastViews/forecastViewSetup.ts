@@ -1,5 +1,5 @@
 import { ref, watch, onMounted, type Ref } from 'vue'
-import { isAfter, isSameDay } from 'date-fns'
+import { startOfDay } from 'date-fns'
 import 'chartjs-adapter-date-fns'
 import { Chart, PointElement, TimeScale, LinearScale, BarController, BarElement, LineController, LineElement, Filler } from 'chart.js'
 import type { ChartDatasetCustomTypesPerDataset, ChartOptions, Point, ParsingOptions } from 'chart.js'
@@ -83,7 +83,7 @@ export function setupForecastView(
 								...dataset,
 								...{parsing: false} as ParsingOptions,
 								normalized: true,
-								data: dataset.data.map((y, i) => ({x: props.forecast.hourly[i].time, y})),
+								data: dataset.data.map((y, i) => ({x: props.forecast.hourly[i].time.getTime(), y})),
 							}
 						}),
 				],
@@ -108,8 +108,8 @@ export function setupForecastView(
 					datalabels: {
 						color: 'gray',
 						align: 'top',
-						formatter: value => value.y,
-						display: function (context) {
+						formatter: value => value.y.toString(),
+						display(context) {
 							// Only show label for the first dataset.
 							if (context.datasetIndex !== 0) {
 								return false
@@ -121,7 +121,9 @@ export function setupForecastView(
 							}
 
 							const {x: time, y: value} = (context.dataset.data[context.dataIndex] as Point)
-							const pointsForDay = (context.dataset.data as Point[]).filter(p => isSameDay(p.x, time))
+							const start = startOfDay(time).getTime()
+							const end = start + 1000*60*60*24
+							const pointsForDay = (context.dataset.data as Point[]).filter(({x}) => start < x && x <= end)
 							const valuesForDay = pointsForDay.map(p => p.y)
 							const currentIndex = pointsForDay.findIndex(p => (p as Point).x === time)
 
@@ -139,7 +141,9 @@ export function setupForecastView(
 							mode: 'x',
 							scaleMode: 'x',
 							// Do not pan when not zoomed or when at the edge of the chart.
-							onPanStart: ({ chart }) => chart.getZoomLevel() !== 1 && computedPanOffset(chart) !== 0 && computedPanOffset(chart) !== 1,
+							onPanStart({ chart }) {
+								return chart.getZoomLevel() !== 1 && computedPanOffset(chart) !== 0 && computedPanOffset(chart) !== 1
+							},
 							onPan({ chart }) {
 								emit('update:zoom', {
 									scale: chart.getZoomLevel(),
@@ -172,8 +176,8 @@ export function setupForecastView(
 					},
 					ticker: {
 						onTick(chart, x) {
-							const timestamp = chart.scales.x.getValueForPixel(x) as number
-							const index = props.forecast.hourly.findIndex(dataPoint => isAfter(new Date(dataPoint.time), timestamp))
+							const timestamp = chart.scales.x.getValueForPixel(x) as number * 1000
+							const index = props.forecast.hourly.findIndex(dataPoint => dataPoint.time.getTime() > timestamp)
 							hoveredDataPoint.value = props.forecast.hourly[index - 1] ?? props.forecast.hourly[0]
 							debounce(emitUpdateTicker.bind(this, x), 1000)
 						},
