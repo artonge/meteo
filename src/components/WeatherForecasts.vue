@@ -55,13 +55,13 @@ function handleHoldStart(event: HoldStartEvent) {
 			<TemperatureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 		<div :key="1">
-			<CloudForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
+			<WindForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 		<div :key="2">
-			<PressureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
+			<CloudForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 		<div :key="3">
-			<WindForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
+			<PressureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 	</Flicking>
 </template>
