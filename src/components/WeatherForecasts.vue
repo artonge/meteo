@@ -1,11 +1,7 @@
 <script setup lang="ts">
-// TODO: Improve disabled state style of header input
-// TODO: Improve loading state style of geolocation button
 // TODO: Add sub zero differentiator
 // TODO: Fix edge detection for panning
 // TODO: Increase discoverability of other panels
-// TODO: Fix ticker freeze
-// TODO: Improve performance
 // TODO: Make it the best SPA
 // TODO: Increase snap to next panel when swiping (swiping just a little snap to the next panel)
 import { ref, watch, onMounted, type Ref } from 'vue'

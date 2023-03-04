@@ -1,22 +1,11 @@
 import type { Chart, Plugin } from 'chart.js'
 import type { TickerOptions } from './index.d'
 
-function getDefaultOptions(): Partial<TickerOptions> {
-	return {
-		color: '#F66',
-		width: 2,
-	}
-}
-
-function getOption<T extends keyof TickerOptions>(chart: Chart, name: T): TickerOptions[T] {
-	return (chart.options?.plugins?.ticker?.[name] ?? getDefaultOptions()[name]) as TickerOptions[T]
-}
-
 function isTouchEvent(event: UIEvent): event is TouchEvent {
 	return event.type === 'touchmove' || event.type === 'touchstart'
 }
 
-function handlePointerEvent(chart: Chart, event: MouseEvent | TouchEvent, touchCanceled: boolean, cancelTouch: () => void) {
+function handlePointerEvent(chart: Chart, options: TickerOptions, event: MouseEvent | TouchEvent, touchCanceled: boolean, cancelTouch: () => void) {
 	// Get mouse location inside canvas
 	const { x: canvasX, y: canvasY } = chart.canvas.getBoundingClientRect()
 	let x = 0
@@ -44,22 +33,22 @@ function handlePointerEvent(chart: Chart, event: MouseEvent | TouchEvent, touchC
 		y = event.clientY - canvasY
 	}
 
-	drawTraceLine(chart, x)
+	drawTraceLine(chart, options, x)
 
-	const onTick = getOption(chart, 'onTick')
+	const onTick = options.onTick
 	if (onTick !== undefined) {
 		onTick(chart, x)
 	}
 }
 
-function drawTraceLine(chart: Chart, x: number) {
+function drawTraceLine(chart: Chart, options: TickerOptions, x: number) {
 	const yScale = chart.scales[chart.getDatasetMeta(0).yAxisID as string]
 
 	chart.draw()
 	chart.ctx.beginPath()
 	chart.ctx.moveTo(x, yScale.getPixelForValue(yScale.max))
-	chart.ctx.lineWidth = getOption(chart, 'width') as number
-	chart.ctx.strokeStyle = getOption(chart, 'color') as string
+	chart.ctx.lineWidth = options.width as number
+	chart.ctx.strokeStyle = options.color as string
 	chart.ctx.lineTo(x, chart.scales.x.bottom)
 	chart.ctx.stroke()
 	chart.ctx.setLineDash([])
@@ -68,7 +57,7 @@ function drawTraceLine(chart: Chart, x: number) {
 export const tickerPlugin: Plugin = {
 	id: 'ticker',
 
-	afterInit: function (chart) {
+	afterInit: function (chart, args, options: TickerOptions) {
 		if (chart.options.plugins === undefined) {
 			chart.options.plugins = {}
 		}
@@ -77,35 +66,41 @@ export const tickerPlugin: Plugin = {
 			chart.options.plugins.ticker = {}
 		}
 
-		chart.options.plugins.ticker.abortController = new AbortController()
+		options.abortController = new AbortController()
 
 		let touchCanceled = false
 		function drawTicker(event: MouseEvent | TouchEvent) {
-			handlePointerEvent(chart, event, touchCanceled, () => touchCanceled = true)
+			handlePointerEvent(chart, options, event, touchCanceled, () => touchCanceled = true)
 		}
-		chart.canvas.addEventListener('mousemove', drawTicker, { signal: getOption(chart, 'abortController').signal })
-		chart.canvas.addEventListener('touchstart', drawTicker, { signal: getOption(chart, 'abortController').signal })
-		chart.canvas.addEventListener('touchmove', drawTicker, { signal: getOption(chart, 'abortController').signal })
-		chart.canvas.addEventListener('touchend', () => touchCanceled = false, { signal: getOption(chart, 'abortController').signal })
+		chart.canvas.addEventListener('mousemove', drawTicker, { signal: options.abortController.signal })
+		chart.canvas.addEventListener('touchstart', drawTicker, { signal: options.abortController.signal })
+		chart.canvas.addEventListener('touchmove', drawTicker, { signal: options.abortController.signal })
+		chart.canvas.addEventListener('touchend', () => touchCanceled = false, { signal: options.abortController.signal })
 		chart.canvas.addEventListener(
 			'mouseleave',
 			() => {
 				chart.draw()
-				const onTickOut = getOption(chart, 'onTickOut')
+				const onTickOut = options.onTickOut
 				if (onTickOut !== undefined) {
 					onTickOut(chart)
 				}
 			},
-			{ signal: getOption(chart, 'abortController').signal }
+			{ signal: options.abortController.signal }
 		)
 
 		chart.setTicker = (x: number) => {
 			if (x === -1) return
-			drawTraceLine(chart, x)
+			drawTraceLine(chart, options, x)
 		}
 	},
 
-	afterDestroy(chart) {
-		getOption(chart, 'abortController').abort()
+	afterDestroy(chart, args, options: TickerOptions) {
+		console.log(options)
+		options.abortController.abort()
+	},
+
+	defaults: {
+		color: '#F66',
+		width: 2,
 	},
 }

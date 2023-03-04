@@ -50,13 +50,30 @@ export function setupForecastView(
 	}, { immediate: true })
 
 	watch(() => props.ticker, (tickerValue) => {
-		if (canvas.value?.offsetLeft === 0) {
-			chart.value?.setTicker(tickerValue)
+		if (canvas.value?.getBoundingClientRect().x === 0) {
+			return
 		}
+
+		setTimeout(() => {
+			if (chart.value === null) {
+				throw new Error('Chart should not be null')
+			}
+
+			chart.value.setTicker(tickerValue)
+			updateHoveredDataPoint(chart.value, tickerValue)
+		})
 	})
 
-	function emitUpdateTicker(x: number) {
+	function emitUpdateTicker(x: number): void {
 		emit('update:ticker', x)
+	}
+
+	const debouncedEmitUpdateTicker = debounce(emitUpdateTicker, 100)
+
+	function updateHoveredDataPoint(chart: Chart, x: number) {
+			const timestamp = chart.scales.x.getValueForPixel(x) as number
+			const index = props.forecast.hourly.findIndex(dataPoint => dataPoint.time.getTime() > timestamp)
+			hoveredDataPoint.value = props.forecast.hourly[index - 1] ?? props.forecast.hourly[0]
 	}
 
 	function createChart() {
@@ -176,10 +193,8 @@ export function setupForecastView(
 					},
 					ticker: {
 						onTick(chart, x) {
-							const timestamp = chart.scales.x.getValueForPixel(x) as number * 1000
-							const index = props.forecast.hourly.findIndex(dataPoint => dataPoint.time.getTime() > timestamp)
-							hoveredDataPoint.value = props.forecast.hourly[index - 1] ?? props.forecast.hourly[0]
-							debounce(emitUpdateTicker.bind(this, x), 1000)
+							updateHoveredDataPoint(chart, x)
+							debouncedEmitUpdateTicker(x)
 						},
 						onTickOut() {
 							emitUpdateTicker(-1)
