@@ -24,7 +24,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			data: forecast.hourly.map(({ temperature }) => temperature),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgb(255, 200, 69, 0.8)',
-			backgroundColor: 'rgba(244, 137, 36, 0.3)',
+			backgroundColor: 'rgba(244, 137, 36, 0.2)',
 			fill: "start",
 			yAxisID: 'yt',
 		},
