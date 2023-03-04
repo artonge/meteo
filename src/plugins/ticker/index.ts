@@ -4,7 +4,7 @@ import type { TickerOptions } from './index.d'
 function getDefaultOptions(): Partial<TickerOptions> {
 	return {
 		color: '#F66',
-		width: 1,
+		width: 2,
 	}
 }
 
