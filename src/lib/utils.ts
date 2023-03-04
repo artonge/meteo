@@ -15,11 +15,7 @@ export function getMin<T>(data: T[], propFn: (obj: T) => number | undefined): nu
 }
 
 export function formatNumber(n: number = 0): string {
-	if (n === 0) {
-		return '0.0'
-	} else {
-		return n.toString()
-	}
+	return new Intl.NumberFormat('fr', { minimumFractionDigits: 1 }).format(n)
 }
 
 export function computedPanOffset(chart: Chart): number {
