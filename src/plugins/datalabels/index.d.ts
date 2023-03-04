@@ -1,3 +1,5 @@
+import type { ChartType, ChartDatasetPropertiesCustomTypesPerDataset } from 'chart.js';
+
 declare module 'chart.js' {
 	interface ChartDatasetPropertiesCustomTypesPerDataset<TType extends ChartType, TData> {
 		/**

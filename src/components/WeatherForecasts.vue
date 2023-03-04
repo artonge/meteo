@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// TODO: Add sub zero differentiator
 // TODO: Fix edge detection for panning
 // TODO: Increase discoverability of other panels
 // TODO: Make it the best SPA

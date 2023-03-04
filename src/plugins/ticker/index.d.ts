@@ -1,4 +1,4 @@
-import type { Chart, ChartType, Plugin } from 'chart.js';
+import type { Chart, ChartType } from 'chart.js';
 
 export interface TickerOptions {
 	color: string,
