@@ -67,29 +67,30 @@ export const tickerPlugin: Plugin = {
 		}
 
 		options.abortController = new AbortController()
+		const signal = options.abortController.signal
 
 		let touchCanceled = false
 		function drawTicker(event: MouseEvent | TouchEvent) {
 			handlePointerEvent(chart, options, event, touchCanceled, () => touchCanceled = true)
 		}
-		chart.canvas.addEventListener('mousemove', drawTicker, { signal: options.abortController.signal })
-		chart.canvas.addEventListener('touchstart', drawTicker, { signal: options.abortController.signal })
-		chart.canvas.addEventListener('touchmove', drawTicker, { signal: options.abortController.signal })
-		chart.canvas.addEventListener('touchend', () => touchCanceled = false, { signal: options.abortController.signal })
-		chart.canvas.addEventListener(
-			'mouseleave',
+		chart.canvas.addEventListener('mousemove', drawTicker, { signal })
+		chart.canvas.addEventListener('touchstart', drawTicker, { signal })
+		chart.canvas.addEventListener('touchmove', drawTicker, { signal })
+		chart.canvas.addEventListener('touchend', () => touchCanceled = false, { signal })
+		chart.canvas.addEventListener('mouseleave',
 			() => {
 				chart.draw()
-				const onTickOut = options.onTickOut
-				if (onTickOut !== undefined) {
-					onTickOut(chart)
+				if (options.onTickOut !== undefined) {
+					options.onTickOut(chart)
 				}
 			},
-			{ signal: options.abortController.signal }
+			{ signal }
 		)
 
 		chart.setTicker = (x: number) => {
-			if (x === -1) return
+			if (x === -1) {
+				return
+			}
 			drawTraceLine(chart, options, x)
 		}
 	},
