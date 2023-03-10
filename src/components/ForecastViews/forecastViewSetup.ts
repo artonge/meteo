@@ -60,6 +60,8 @@ export function setupForecastView(
 				throw new Error('Chart should not be null')
 			}
 
+			console.debug('automated tick to', tickerValue)
+
 			chart.value.setTicker(tickerValue)
 			updateHoveredDataPoint(chart.value, tickerValue)
 		})
@@ -75,6 +77,8 @@ export function setupForecastView(
 				throw new Error('Chart should not be null')
 			}
 
+			console.debug('automated zoom to', { ...props.zoom })
+
 			const xScale = chart.value.scales[chart.value.getDatasetMeta(0).xAxisID as string]
 			chart.value.resetZoom()
 			chart.value.zoom({ x: zoomValue.scale })
@@ -85,11 +89,18 @@ export function setupForecastView(
 	function emitUpdateTicker(x: number): void { emit('update:ticker', x) }
 	const debouncedEmitUpdateTicker = debounce(emitUpdateTicker, 100)
 
-	const debouncedEmitUpdateZoom = debounce(function emitUpdateZoom(zoom: typeof props.zoom): void {
+	const debouncedEmitUpdateZoom = debounce(function emitUpdateZoom(chart: Chart): void {
 		if (canvas.value?.getBoundingClientRect().x !== 0) {
 			return
 		}
 
+		const zoom = {
+			scale: chart.getZoomLevel(),
+			min: chart.scales.x.min,
+			max: chart.scales.x.max,
+		}
+
+		console.debug('emit update:zoom', zoom)
 		emit('update:zoom', zoom)
 	}, 100)
 
@@ -183,7 +194,7 @@ export function setupForecastView(
 
 								const direction = (event as any).direction as number
 
-								console.log('pan start', {
+								console.debug('pan start', event.type, {
 									...props.zoom,
 									dataMin: props.forecast?.hourly[0].time.getTime(),
 									dataMax: props.forecast?.hourly[props.forecast.hourly.length - 1].time.getTime(),
@@ -191,28 +202,24 @@ export function setupForecastView(
 								})
 
 								if (direction !== 2 && direction !== 4) {
-									console.log("abort pan")
+									console.debug("abort pan - vertical panning")
 									return false
 								}
 
 								if (props.zoom.min === props.forecast.hourly[0].time.getTime() && direction !== 2) {
-									console.log("abort pan")
+									console.debug("abort pan - edge")
 									return false
 								}
 
 								if (props.zoom.max === props.forecast.hourly[props.forecast.hourly.length - 1].time.getTime() && direction !== 4) {
-									console.log("abort pan")
+									console.debug("abort pan")
 									return false
 								}
 
 								return true
 							},
 							onPan({ chart }) {
-								debouncedEmitUpdateZoom({
-									scale: chart.getZoomLevel(),
-									min: chart.scales.x.min,
-									max: chart.scales.x.max,
-								})
+								debouncedEmitUpdateZoom(chart)
 							},
 						},
 						zoom: {
@@ -223,13 +230,10 @@ export function setupForecastView(
 							pinch: {
 								enabled: true
 							},
+
 							onZoom({ chart }) {
-								debouncedEmitUpdateZoom({
-									scale: chart.getZoomLevel(),
-									min: chart.scales.x.min,
-									max: chart.scales.x.max,
-								})
-							}
+								debouncedEmitUpdateZoom(chart)
+							},
 						},
 						limits: {
 							x: {
