@@ -1,43 +1,32 @@
 import type { Chart, Plugin } from 'chart.js'
 import type { TickerOptions } from './index.d'
 
-function isTouchEvent(event: UIEvent): event is TouchEvent {
-	return event.type === 'touchmove' || event.type === 'touchstart'
-}
+function handlePointerEvent(chart: Chart, options: TickerOptions, event: PointerEvent, touchCanceled: boolean, cancelTouch: () => void) {
+	const y = event.offsetY
+	const x = event.offsetX
 
-function handlePointerEvent(chart: Chart, options: TickerOptions, event: MouseEvent | TouchEvent, touchCanceled: boolean, cancelTouch: () => void) {
-	// Get mouse location inside canvas
-	const { x: canvasX, y: canvasY } = chart.canvas.getBoundingClientRect()
-	let x = 0
-	let y = 0
+	if (touchCanceled) {
+		return
+	}
 
-	if (isTouchEvent(event)) {
-		x = event.touches[0].clientX - canvasX
-		y = event.touches[0].clientY - canvasY
-
+	if (event.pointerType === 'touch' && event.type === 'pointerdown') {
 		// Ignore touch starting outside of the bottom scale.
 		// Add a 50% extra space to trigger it on mobile as the bottom scale is a bit small.
 		const isBellowTopOfScale = (chart.scales.x.top - 0.5 * (chart.scales.x.bottom - chart.scales.x.top)) < y
 		const isAboveBottomOfScale = y < chart.scales.x.bottom
-		if (event.type === 'touchstart' && !(isBellowTopOfScale && isAboveBottomOfScale)) {
+		if (!(isBellowTopOfScale && isAboveBottomOfScale)) {
 			cancelTouch()
 			return
 		}
 
-		if (event.type === 'touchmove' && touchCanceled) {
-			return
-		}
+		console.log("stop propagation", event.type)
 		event.stopPropagation()
-	} else {
-		x = event.clientX - canvasX
-		y = event.clientY - canvasY
 	}
 
 	drawTraceLine(chart, options, x)
 
-	const onTick = options.onTick
-	if (onTick !== undefined) {
-		onTick(chart, x)
+	if (options.onTick !== undefined) {
+		options.onTick(chart, x)
 	}
 }
 
@@ -70,22 +59,12 @@ export const tickerPlugin: Plugin = {
 		const signal = options.abortController.signal
 
 		let touchCanceled = false
-		function drawTicker(event: MouseEvent | TouchEvent) {
+		function drawTicker(event: PointerEvent) {
 			handlePointerEvent(chart, options, event, touchCanceled, () => touchCanceled = true)
 		}
-		chart.canvas.addEventListener('mousemove', drawTicker, { signal })
-		chart.canvas.addEventListener('touchstart', drawTicker, { signal })
-		chart.canvas.addEventListener('touchmove', drawTicker, { signal })
-		chart.canvas.addEventListener('touchend', () => touchCanceled = false, { signal })
-		chart.canvas.addEventListener('mouseleave',
-			() => {
-				chart.draw()
-				if (options.onTickOut !== undefined) {
-					options.onTickOut(chart)
-				}
-			},
-			{ signal }
-		)
+		chart.canvas.addEventListener('pointerdown', drawTicker, { signal })
+		chart.canvas.addEventListener('pointermove', drawTicker, { signal })
+		chart.canvas.addEventListener('pointerup', () => touchCanceled = false, { signal })
 
 		chart.setTicker = (x: number) => {
 			if (x === -1) {
