@@ -21,6 +21,16 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	(forecast: Forecast) => [
 		{
 			type: 'line',
+			label: 'Past wind',
+			data: [...forecast.hourly.map(({ windSpeed }) => windSpeed).filter((_, i) => props.forecast.hourly[i].time.getTime() < Date.now())],
+			cubicInterpolationMode: 'monotone',
+			borderColor: 'rgba(100, 100, 100, 0.8)',
+			backgroundColor: 'rgba(200, 200, 200, 0.8)',
+			fill: 'origin',
+			yAxisID: 'y',
+		},
+		{
+			type: 'line',
 			label: 'Wind (Km/h)',
 			data: forecast.hourly.map(({ windSpeed }) => windSpeed),
 			cubicInterpolationMode: 'monotone',

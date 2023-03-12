@@ -6,7 +6,6 @@ import type { ChartDatasetCustomTypesPerDataset, ChartOptions, Point, ParsingOpt
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import zoomPlugin from 'chartjs-plugin-zoom'
 import type { Forecast, HourlyForecast } from '@/lib/open-meteo';
-import { computedPanOffset } from '@/lib/utils'
 import { tickerPlugin } from '@/plugins/ticker'
 import { debounce } from 'debounce'
 
@@ -279,6 +278,12 @@ export function setupForecastView(
 							offset: false,
 						},
 						offset: false,
+					},
+					y_past: {
+						display: false,
+						max: 1,
+						min: 0,
+						beginAtZero: true,
 					},
 					...getScales(props.forecast)
 				},

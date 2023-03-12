@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Forecast } from '@/lib/open-meteo';
-import { formatNumber, getMax, getMin } from '@/lib/utils'
+import { formatNumber, getMax, getMin, roundNumber } from '@/lib/utils'
+import type { Point, ScriptableContext } from 'chart.js';
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 
@@ -24,6 +25,16 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		return [
 			{
 				type: 'line',
+				label: 'Past temperatures',
+				data: [...forecast.hourly.map(({ temperature }) => temperature).filter((_, i) => props.forecast.hourly[i].time.getTime() < Date.now())],
+				cubicInterpolationMode: 'monotone',
+				borderColor: 'rgba(100, 100, 100, 0.8)',
+				backgroundColor: 'rgba(200, 200, 200, 0.8)',
+				fill: "start",
+				yAxisID: 'yt',
+			},
+			{
+				type: 'line',
 				label: 'Sub zero temperatures',
 				data: hasSubZeroTemperatures ? forecast.hourly.map(({ temperature }) => temperature < 0 ? temperature : 0) : [],
 				borderColor: 'rgba(3, 126, 243, 0.8)',
@@ -36,7 +47,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			},
 			{
 				type: 'line',
-				label: 'Temperature',
+				label: 'Temperatures',
 				data: forecast.hourly.map(({ temperature }) => temperature),
 				cubicInterpolationMode: 'monotone',
 				borderColor: 'rgb(244, 137, 36, 0.8)',
@@ -46,7 +57,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			},
 			{
 				type: 'bar',
-				label: `Precipitation over the last hour`,
+				label: `Precipitations over the last hour`,
 				data: forecast.hourly.map(({ precipitation }) => precipitation),
 				barThickness: 'flex',
 				backgroundColor: 'rgba(0, 145, 205, 0.7)',

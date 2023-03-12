@@ -29,6 +29,16 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		},
 		{
 			type: 'line',
+			label: 'Past pressure',
+			data: [...forecast.hourly.map(({ pressureMSL }) => pressureMSL).filter((_, i) => props.forecast.hourly[i].time.getTime() < Date.now())],
+			cubicInterpolationMode: 'monotone',
+			borderColor: 'rgba(100, 100, 100, 0.8)',
+			backgroundColor: 'rgba(200, 200, 200, 0.8)',
+			fill: 'origin',
+			yAxisID: 'yp',
+		},
+		{
+			type: 'line',
 			label: 'Pressure (hPa)',
 			data: forecast.hourly.map(({ pressureMSL }) => pressureMSL),
 			cubicInterpolationMode: 'monotone',
