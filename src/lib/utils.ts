@@ -1,4 +1,4 @@
-import type { Chart } from "chart.js"
+import { useMemoize } from '@vueuse/core'
 
 export function getMax<T>(data: T[], propFn: (obj: T) => number | undefined): number {
 	return data
@@ -14,6 +14,7 @@ export function getMin<T>(data: T[], propFn: (obj: T) => number | undefined): nu
 		.reduce((maxValue, currentValue) => Math.min(maxValue, currentValue))
 }
 
-export function formatNumber(n: number = 0): string {
+// Memoized as it can be called a lot of time when moving the ticker.
+export const formatNumber = useMemoize(function formatNumber(n: number = 0): string {
 	return new Intl.NumberFormat('fr', { minimumFractionDigits: 1 }).format(n)
-}
+})
