@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Forecast } from '@/lib/open-meteo';
-import { formatNumber, getMax, getMin, roundNumber } from '@/lib/utils'
-import type { Point, ScriptableContext } from 'chart.js';
+import { formatNumber, getMax, getMin } from '@/lib/utils'
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 

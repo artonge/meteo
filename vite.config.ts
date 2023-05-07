@@ -19,18 +19,25 @@ export default defineConfig({
 				description: 'Get weather forecasts for any place in the world!',
 				theme_color: '#ffcc00',
 				background_color: "#22378b",
+				start_url: "/",
 				display: "standalone",
 				icons: [
 					{
 						"src": "/android-chrome-192x192.png",
 						"sizes": "192x192",
-						"type": "image/png"
+						"type": "image/png",
 					},
 					{
-						"src": "/android-chrome-256x256.png",
-						"sizes": "256x256",
-						"type": "image/png"
-					}
+						"src": "/android-chrome-512x512.png",
+						"sizes": "512x512",
+						"type": "image/png",
+					},
+					{
+						"src": "/android-chrome-512x512.png",
+						"sizes": "512x512",
+						"type": "image/png",
+						"purpose": "maskable",
+					},
 				],
 			},
 		})
