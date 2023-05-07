@@ -24,28 +24,54 @@ const dailyParams = [
 ]
 
 const models = [
+	'meteofrance_arome_france_hd',
+	'meteofrance_seamless',
+	'metno_nordic',
 	'best_match',
 ]
 
+
 export async function fetchForecast(latitude: number, longitude: number): Promise<Forecast> {
-	const result = await fetch(`${endpoint}?latitude=${latitude}&longitude=${longitude}&hourly=${hourlyParams.join(',')}&models=${models.join(',')}&daily=${dailyParams.join(',')}&current_weather=true&timezone=auto`)
+	const url = new URL(endpoint)
+	url.searchParams.append('latitude', latitude.toString())
+	url.searchParams.append('longitude', longitude.toString())
+	url.searchParams.append('hourly', hourlyParams.join(','))
+	url.searchParams.append('models', models.join(','))
+	url.searchParams.append('daily', dailyParams.join(','))
+	url.searchParams.append('current_weather', true.toString())
+	url.searchParams.append('timezone', 'auto')
+
+	const result = await fetch(url)
 	const forecast = await result.json()
+
+	function getValue(key: string, index: number) {
+		if (forecast.hourly[key] !== undefined && forecast.hourly[key][index] !== null) {
+			return forecast.hourly[key][index]
+		} else {
+			for (const model of models) {
+				const modelKey = `${key}_${model}`
+				if (forecast.hourly[modelKey] !== undefined && forecast.hourly[modelKey][index] !== null) {
+					return forecast.hourly[modelKey][index]
+				}
+			}
+		}
+	}
 
 	return {
 		hourly: forecast.hourly.time.map((timestamp: number, index: number) => {
 			return {
 				time: new Date(timestamp),
-				temperature: forecast.hourly.temperature_2m[index],
-				relativeHumidity: forecast.hourly.relativehumidity_2m[index],
-				apparentTemperature: forecast.hourly.apparent_temperature[index],
-				precipitation: forecast.hourly.precipitation[index],
-				cloudCover: forecast.hourly.cloudcover[index],
-				cloudCoverLow: forecast.hourly.cloudcover_low[index],
-				cloudCoverMid: forecast.hourly.cloudcover_mid[index],
-				cloudCoverHigh: forecast.hourly.cloudcover_high[index],
-				windSpeed: forecast.hourly.windspeed_10m[index],
-				windDirection: forecast.hourly.winddirection_10m[index],
-				pressureMSL: forecast.hourly.pressure_msl[index],
+				temperature: getValue('temperature_2m', index),
+				relativeHumidity: getValue('relativehumidity_2m', index),
+				apparentTemperature: getValue('apparent_temperature', index),
+				precipitation: getValue('precipitation', index),
+				cloudCover: getValue('cloudcover', index),
+				cloudCoverLow: getValue('cloudcover_low', index),
+				cloudCoverMid: getValue('cloudcover_mid', index),
+				cloudCoverHigh: getValue('cloudcover_high', index),
+				windSpeed: getValue('windspeed_10m', index),
+				windDirection: getValue('winddirection_10m', index),
+				pressureMSL: getValue('pressure_msl', index),
 			}
 		}),
 		daily: forecast.daily.time.map((timestamp: number, index: number) => {
