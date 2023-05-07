@@ -9,7 +9,7 @@ import { fetchForecast, type Forecast } from '@/lib/open-meteo/api'
 import type { City } from '@/lib/cities'
 
 import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiThermometer } from '@mdi/js'
+import { mdiLoading, mdiThermometer } from '@mdi/js'
 import { mdiWindTurbine } from '@mdi/js'
 import { mdiWeatherCloudy } from '@mdi/js'
 import { mdiWaterOutline } from '@mdi/js'
@@ -31,11 +31,10 @@ const currentPanelIndex = ref(0)
 const flicking: Ref<Flicking | null> = ref(null)
 
 watch(() => props.city, () => _fetchForecast(props.city.latitude, props.city.longitude))
-onMounted(async () => {
-	await _fetchForecast(props.city.latitude, props.city.longitude)
-})
+onMounted(async () => await _fetchForecast(props.city.latitude, props.city.longitude))
 
 async function _fetchForecast(latitude: number, longitude: number) {
+	forecast.value = null
 	forecast.value = await fetchForecast(latitude, longitude)
 }
 
@@ -115,6 +114,8 @@ function handlePanelChanged({index}: WillChangeEvent) {
 			<PressureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 	</Flicking>
+	<svg-icon v-else type="mdi" :path="mdiLoading" class="loading" :size="64"></svg-icon>
+
 	<nav class="bottom-menu">
 		<button aria-label="Go to temperature chart" @click="flicking?.moveTo(0)" class="menu-item" :class="{selected: currentPanelIndex === 0}">
 			<svg-icon type="mdi" :path="mdiThermometer"></svg-icon>
@@ -136,7 +137,12 @@ function handlePanelChanged({index}: WillChangeEvent) {
 </template>
 <style scoped lang="scss">
 .flicking-viewport {
-	height: calc(100% - 50px);
+	flex-grow: 1;
+}
+
+.loading {
+	align-self: center;
+	flex-grow: 1;
 }
 
 .bottom-menu {

@@ -20,5 +20,7 @@ const selectedCity: Ref<City | null> = ref(null);
 <style scoped lang="scss">
 main {
 	height: calc(100dvh - 80px);
+	display: flex;
+	flex-direction: column;
 }
 </style>

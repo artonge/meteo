@@ -82,7 +82,7 @@ button:hover {
 	}
 }
 
-.loading-icon svg {
+.loading-icon svg, .loading {
 	animation: vSelectSpinner 1.1s infinite linear;
 }
 

@@ -232,9 +232,5 @@ function handleGeolocationRequest() {
 		align-items: center;
 		justify-content: center;
 	}
-
-	.loading {
-		animation: vSelectSpinner 1.1s infinite linear;
-	}
 }
 </style>
