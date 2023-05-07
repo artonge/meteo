@@ -85,7 +85,11 @@ function handleMoveStart(event: MoveStartEvent) {
 </script>
 <template>
 	<Flicking v-if="forecast !== null" :options="{
-		align: 'prev', circular: true, panelsPerView: 1, moveType: ['strict', { count: 1 }]
+		align: 'prev',
+		circular: true,
+		panelsPerView: 1,
+		moveType: ['strict', { count: 1 }],
+		inputType: ['pointer'],
 	}" @holdStart="handleHoldStart" @moveStart="handleMoveStart">
 		<div :key="0">
 			<TemperatureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />

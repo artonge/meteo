@@ -9,20 +9,24 @@ function handlePointerEvent(chart: Chart, options: TickerOptions, event: Pointer
 		return
 	}
 
-	if (event.pointerType === 'touch' && event.type === 'pointerdown') {
-		// Ignore touch starting outside of the bottom scale.
-		// Add a 50% extra space to trigger it on mobile as the bottom scale is a bit small.
-		const isBellowTopOfScale = (chart.scales.x.top - 0.5 * (chart.scales.x.bottom - chart.scales.x.top)) < y
-		const isAboveBottomOfScale = y < chart.scales.x.bottom
+	console.debug("Ticker", event)
 
-		if (!(isBellowTopOfScale && isAboveBottomOfScale)) {
-			cancelTouch()
-			return
+	if (event.pointerType === 'touch') {
+		if (event.type === 'pointerdown') {
+			// Ignore touch starting outside of the bottom scale.
+			// Add a 50% extra space to trigger it on mobile as the bottom scale is a bit small.
+			const isBellowTopOfScale = (chart.scales.x.top - 0.5 * (chart.scales.x.bottom - chart.scales.x.top)) < y
+			const isAboveBottomOfScale = y < chart.scales.x.bottom
+
+			if (!(isBellowTopOfScale && isAboveBottomOfScale)) {
+				cancelTouch()
+				return
+			}
 		}
-	}
 
-	console.log("stop propagation", event.type)
-	event.stopPropagation()
+		console.debug("Ticker: stop propagation", event.type)
+		event.stopPropagation()
+	}
 
 	drawTraceLine(chart, options, x)
 
