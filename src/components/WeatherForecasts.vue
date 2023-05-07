@@ -39,7 +39,7 @@ async function _fetchForecast(latitude: number, longitude: number) {
 }
 
 function handleHoldStart(event: HoldStartEvent) {
-	console.log('flicking hold start', {
+	console.debug('Flicking: hold start', {
 		...zoom.value,
 		dataMin: forecast.value?.hourly[0].time.getTime(),
 		dataMax: forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime(),
@@ -59,13 +59,14 @@ function handleHoldStart(event: HoldStartEvent) {
 		return
 	}
 
-	console.log("abort flick")
+	console.debug("Flicking: abort flick")
 	event.stop()
 }
 
 function handleMoveStart(event: MoveStartEvent) {
 	console.debug('Flicking: move start', {
 		...zoom.value,
+		event,
 		dataMin: forecast.value?.hourly[0].time.getTime(),
 		dataMax: forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime(),
 		direction: event.direction,
@@ -78,13 +79,18 @@ function handleMoveStart(event: MoveStartEvent) {
 		return
 	}
 
+	// Always allow when is is a programmatic move.
+	if (!event.isTrusted) {
+		return
+	}
+
 	if (zoom.value.min === forecast.value?.hourly[0].time.getTime() && event.direction === 'NEXT') {
-		console.log("abort flick")
+		console.debug("Flicking: abort flick")
 		event.stop()
 	}
 
 	if (zoom.value.max === forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime() && event.direction === 'PREV') {
-		console.log("abort flick")
+		console.debug("Flicking: abort flick")
 		event.stop()
 	}
 }
