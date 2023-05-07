@@ -125,7 +125,7 @@ function handleGeolocationRequest() {
 				<svg-icon v-if="loading" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			</template>
 		</v-select>
-		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest">
+		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest" aria-label="Use device location">
 			<svg-icon v-if="loadingCurrentLocation" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			<svg-icon v-else type="mdi" :path="mdiCrosshairs"></svg-icon>
 		</button>

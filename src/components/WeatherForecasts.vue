@@ -1,7 +1,6 @@
 <script setup lang="ts">
 // TODO: Fix edge detection for panning
 // TODO: Increase discoverability of other panels
-// TODO: Make it the best SPA
 // TODO: Increase snap to next panel when swiping (swiping just a little snap to the next panel)
 import { ref, watch, onMounted, type Ref } from 'vue'
 import Flicking, { type HoldStartEvent, type MoveStartEvent } from '@egjs/vue3-flicking'
