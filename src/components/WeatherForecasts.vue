@@ -1,13 +1,18 @@
 <script setup lang="ts">
 // TODO: Fix edge detection for panning
-// TODO: Increase discoverability of other panels
 // TODO: Increase snap to next panel when swiping (swiping just a little snap to the next panel)
 import { ref, watch, onMounted, type Ref } from 'vue'
-import Flicking, { type HoldStartEvent, type MoveStartEvent } from '@egjs/vue3-flicking'
+import Flicking, { type HoldStartEvent, type MoveStartEvent, type WillChangeEvent } from '@egjs/vue3-flicking'
 import '@egjs/vue3-flicking/dist/flicking.css'
 
 import { fetchForecast, type Forecast } from '@/lib/open-meteo/api'
 import type { City } from '@/lib/cities'
+
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiThermometer } from '@mdi/js'
+import { mdiWindTurbine } from '@mdi/js'
+import { mdiWeatherCloudy } from '@mdi/js'
+import { mdiWaterOutline } from '@mdi/js'
 
 import TemperatureForecast from './ForecastViews/TemperatureForecast.vue'
 import CloudForecast from './ForecastViews/CloudForecast.vue'
@@ -22,6 +27,8 @@ const zoom = ref({
 	max: 0,
 })
 const ticker = ref(0)
+const currentPanelIndex = ref(0)
+const flicking: Ref<Flicking | null> = ref(null)
 
 watch(() => props.city, () => _fetchForecast(props.city.latitude, props.city.longitude))
 onMounted(async () => {
@@ -58,7 +65,7 @@ function handleHoldStart(event: HoldStartEvent) {
 }
 
 function handleMoveStart(event: MoveStartEvent) {
-	console.log('flicking move start', {
+	console.debug('Flicking: move start', {
 		...zoom.value,
 		dataMin: forecast.value?.hourly[0].time.getTime(),
 		dataMax: forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime(),
@@ -82,15 +89,19 @@ function handleMoveStart(event: MoveStartEvent) {
 		event.stop()
 	}
 }
+
+function handlePanelChanged({index}: WillChangeEvent) {
+	currentPanelIndex.value = index
+}
 </script>
 <template>
-	<Flicking v-if="forecast !== null" :options="{
+	<Flicking v-if="forecast !== null" ref="flicking" :options="{
 		align: 'prev',
 		circular: true,
 		panelsPerView: 1,
 		moveType: ['strict', { count: 1 }],
 		inputType: ['pointer'],
-	}" @holdStart="handleHoldStart" @moveStart="handleMoveStart">
+	}" @holdStart="handleHoldStart" @moveStart="handleMoveStart" @willChange="handlePanelChanged">
 		<div :key="0">
 			<TemperatureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
@@ -104,9 +115,49 @@ function handleMoveStart(event: MoveStartEvent) {
 			<PressureForecast v-model:zoom="zoom" v-model:ticker="ticker" :forecast="forecast" />
 		</div>
 	</Flicking>
+	<nav class="bottom-menu">
+		<button aria-label="Go to temperature chart" @click="flicking?.moveTo(0)" class="menu-item" :class="{selected: currentPanelIndex === 0}">
+			<svg-icon type="mdi" :path="mdiThermometer"></svg-icon>
+			Temperature
+		</button>
+		<button aria-label="Go to wind chart" @click="flicking?.moveTo(1)" class="menu-item" :class="{selected: currentPanelIndex === 1}">
+			<svg-icon type="mdi" :path="mdiWindTurbine"></svg-icon>
+			Wind
+		</button>
+		<button aria-label="Go to cloud chart" @click="flicking?.moveTo(2)" class="menu-item" :class="{selected: currentPanelIndex === 2}">
+			<svg-icon type="mdi" :path="mdiWeatherCloudy"></svg-icon>
+			Cloud
+		</button>
+		<button aria-label="Go to pressure chart" @click="flicking?.moveTo(3)" class="menu-item" :class="{selected: currentPanelIndex === 3}">
+			<svg-icon type="mdi" :path="mdiWaterOutline"></svg-icon>
+			Pressure
+		</button>
+	</nav>
 </template>
 <style scoped lang="scss">
 .flicking-viewport {
-	height: 100%;
+	height: calc(100% - 50px);
+}
+
+.bottom-menu {
+	display: flex;
+	width: 100%;
+	height: 50px;
+	justify-content: space-around;
+	align-items: center;
+
+	.menu-item {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		border-left: 1px solid var(--color-border);
+		height: 100%;
+		padding: 8px;
+
+		&.selected {
+			background-color: var(--color-background-secondary);
+		}
+	}
 }
 </style>
