@@ -14,14 +14,15 @@ function handlePointerEvent(chart: Chart, options: TickerOptions, event: Pointer
 		// Add a 50% extra space to trigger it on mobile as the bottom scale is a bit small.
 		const isBellowTopOfScale = (chart.scales.x.top - 0.5 * (chart.scales.x.bottom - chart.scales.x.top)) < y
 		const isAboveBottomOfScale = y < chart.scales.x.bottom
+
 		if (!(isBellowTopOfScale && isAboveBottomOfScale)) {
 			cancelTouch()
 			return
 		}
-
-		console.log("stop propagation", event.type)
-		event.stopPropagation()
 	}
+
+	console.log("stop propagation", event.type)
+	event.stopPropagation()
 
 	drawTraceLine(chart, options, x)
 
