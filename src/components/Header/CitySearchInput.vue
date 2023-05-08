@@ -10,7 +10,8 @@ import { debounce } from 'debounce'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
-import { createCitiesIndex, fetchCities, isCitiesIndexLoaded, searchCities, type City } from '@/lib/cities'
+import { createCitiesIndex, fetchCities, isCitiesIndexLoaded, searchCities } from '@/lib/citiesSearchProxy'
+import type { City } from '@/lib/models'
 import Deselect from './Deselect.vue'
 
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
@@ -46,29 +47,25 @@ async function handleSelectOpen() {
 	}
 }
 
-function searchCity(query: string) {
+async function searchCity(query: string) {
 	if (query === '') {
 		return
 	}
 
 	loading.value = true
 
-	if (!isCitiesIndexLoaded()) {
+	if (!(await isCitiesIndexLoaded())) {
 		console.debug('Index not loaded, saving query:', query)
 		savedQuery = query
 		return
 	}
 
-	// Need to wrap into a timeout as search city is synchronous.
-	// So vue do not render before the response and the loading icon is not displayed.
-	setTimeout(() => {
-		foundCities.value = searchCities(query)
-		console.debug('Found cities:', foundCities.value)
-		loading.value = false
-	})
+	foundCities.value = await searchCities(query)
+	console.debug('Found cities:', foundCities.value)
+	loading.value = false
 }
 
-const debouncedSearchCity = debounce(searchCity, 500)
+const debouncedSearchCity = debounce(searchCity, 0)
 
 watch(selectedCity, (newValue, oldValue) => {
 	console.debug('City selected', selectedCity.value, newValue, oldValue, newValue === oldValue)

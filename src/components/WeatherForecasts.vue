@@ -6,7 +6,7 @@ import Flicking, { type HoldStartEvent, type MoveStartEvent, type WillChangeEven
 import '@egjs/vue3-flicking/dist/flicking.css'
 
 import { fetchForecast, type Forecast } from '@/lib/open-meteo/api'
-import type { City } from '@/lib/cities'
+import type { City } from '@/lib/models'
 
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiLoading, mdiThermometer } from '@mdi/js'
