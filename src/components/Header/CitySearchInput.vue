@@ -68,7 +68,7 @@ function searchCity(query: string) {
 	})
 }
 
-const debouncedSearchCity = debounce(searchCity, 200)
+const debouncedSearchCity = debounce(searchCity, 500)
 
 watch(selectedCity, (newValue, oldValue) => {
 	console.debug('City selected', selectedCity.value, newValue, oldValue, newValue === oldValue)
