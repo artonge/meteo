@@ -57,6 +57,19 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 		}
 	}
 
+	function getUnit(key: string) {
+		if (forecast.hourly_units[key] !== undefined) {
+			return forecast.hourly_units[key]
+		} else {
+			for (const model of models) {
+				const modelKey = `${key}_${model}`
+				if (forecast.hourly_units[modelKey] !== undefined) {
+					return forecast.hourly_units[modelKey]
+				}
+			}
+		}
+	}
+
 	return {
 		hourly: forecast.hourly.time.map((timestamp: number, index: number) => {
 			return {
@@ -82,17 +95,17 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 			}
 		}),
 		units: {
-			temperature: forecast.hourly_units.temperature_2m,
-			relativeHumidity: forecast.hourly_units.relativehumidity_2m,
-			apparentTemperature: forecast.hourly_units.apparent_temperature,
-			precipitation: forecast.hourly_units.precipitation,
-			cloudCover: forecast.hourly_units.cloudcover,
-			cloudCoverLow: forecast.hourly_units.cloudcover_low,
-			cloudCoverMid: forecast.hourly_units.cloudcover_mid,
-			cloudCoverHigh: forecast.hourly_units.cloudcover_high,
-			windSpeed: forecast.hourly_units.windspeed_10m,
-			windDirection: forecast.hourly_units.winddirection_10m,
-			pressureMSL: forecast.hourly_units.pressure_msl,
+			temperature: getUnit('temperature_2m'),
+			relativeHumidity: getUnit('relativehumidity_2m'),
+			apparentTemperature: getUnit('apparent_temperature'),
+			precipitation: getUnit('precipitation'),
+			cloudCover: getUnit('cloudcover'),
+			cloudCoverLow: getUnit('cloudcover_low'),
+			cloudCoverMid: getUnit('cloudcover_mid'),
+			cloudCoverHigh: getUnit('cloudcover_high'),
+			windSpeed: getUnit('windspeed_10m'),
+			windDirection: getUnit('winddirection_10m'),
+			pressureMSL: getUnit('pressure_msl'),
 		}
 	}
 }
