@@ -20,24 +20,13 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	(forecast: Forecast) => [
 		{
 			type: 'line',
-			label: 'Cloud total',
-			data: forecast.hourly.map(({ cloudCoverLow, cloudCoverMid, cloudCoverHigh }) => cloudCoverLow + cloudCoverMid + cloudCoverHigh),
-			borderColor: 'rgba(0, 0, 0, 0)',
-			backgroundColor: 'rgba(0, 0, 0, 0)',
-			yAxisID: 'yt',
-		},
-		{
-			type: 'line',
 			label: 'Cloud low',
 			data: forecast.hourly.map(({ cloudCoverLow }) => cloudCoverLow),
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(159, 159, 163, 0.2)',
 			backgroundColor: 'rgba(159, 159, 163, 0.2)',
 			fill: 'origin',
-			yAxisID: 'yc',
-			datalabels: {
-				display: false,
-			},
+			yAxisID: 'yc1',
 		},
 		{
 			type: 'line',
@@ -47,10 +36,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			borderColor: 'rgba(159, 159, 163, 0.2)',
 			backgroundColor: 'rgba(159, 159, 163, 0.2)',
 			fill: 'origin',
-			yAxisID: 'yc',
-			datalabels: {
-				display: false,
-			},
+			yAxisID: 'yc2',
 		},
 		{
 			type: 'line',
@@ -60,10 +46,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			borderColor: 'rgba(159, 159, 163, 0.2)',
 			backgroundColor: 'rgba(159, 159, 163, 0.2)',
 			fill: 'origin',
-			yAxisID: 'yc',
-			datalabels: {
-				display: false,
-			},
+			yAxisID: 'yc3',
 		},
 		{
 			type: 'line',
@@ -73,7 +56,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			borderColor: 'rgba(159, 159, 163, 0.2)',
 			backgroundColor: 'rgba(159, 159, 163, 0.2)',
 			fill: 'origin',
-			yAxisID: 'yci',
+			yAxisID: 'yc1',
 			datalabels: {
 				display: false,
 			},
@@ -86,7 +69,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			borderColor: 'rgba(159, 159, 163, 0.2)',
 			backgroundColor: 'rgba(159, 159, 163, 0.2)',
 			fill: 'origin',
-			yAxisID: 'yci',
+			yAxisID: 'yc2',
 			datalabels: {
 				display: false,
 			},
@@ -99,7 +82,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			borderColor: 'rgba(159, 159, 163, 0.2)',
 			backgroundColor: 'rgba(159, 159, 163, 0.2)',
 			fill: 'origin',
-			yAxisID: 'yci',
+			yAxisID: 'yc3',
 			datalabels: {
 				display: false,
 			},
@@ -118,26 +101,20 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	],
 	() => {
 		return {
-			yc: {
+			yc1: {
 				display: false,
-				max: 600,
-				min: -600,
-				beginAtZero: true,
-				stacked: true,
+				max: 520,
+				min: -110,
 			},
-			yci: {
+			yc2: {
 				display: false,
-				max: 600,
-				min: -600,
-				beginAtZero: true,
-				stacked: true,
+				max: 315,
+				min: -315,
 			},
-			yt: {
+			yc3: {
 				display: false,
-				max: 600,
-				min: -600,
-				beginAtZero: true,
-				stacked: true,
+				max: 110,
+				min: -520,
 			},
 			yp: {
 				display: false,
