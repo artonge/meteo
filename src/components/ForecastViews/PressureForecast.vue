@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Forecast } from '@/lib/open-meteo';
-import { formatNumber, getMax, getMin } from '@/lib/utils'
+import { getMax, getMin } from '@/lib/utils'
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 
@@ -91,12 +91,12 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 <template>
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
-			<span class="forecast__details__humidity">Humidité</span>
+			<span class="forecast__details__humidity">{{ $t('Humidity') }}</span>
 			<span>{{ hoveredDataPoint.relativeHumidity }}{{ forecast.units.relativeHumidity }}</span>
 		</template>
 		<template #detail_2>
-			<span class="forecast__details__pressure">Pression</span>
-			<span>{{ formatNumber(hoveredDataPoint.pressureMSL) }}{{ forecast.units.pressureMSL }}</span>
+			<span class="forecast__details__pressure">{{ $t('Pressure') }}</span>
+			<span>{{ $n(hoveredDataPoint.pressureMSL, { minimumFractionDigits: 1 }) }}{{ forecast.units.pressureMSL }}</span>
 		</template>
 		<template #canvas>
 			<canvas ref="canvas"></canvas>

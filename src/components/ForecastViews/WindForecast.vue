@@ -57,7 +57,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 <template>
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
-			<span class="forecast__details__vitesse">Vitesse</span>
+			<span class="forecast__details__vitesse">{{ $t('Wind speed') }}</span>
 			<span>{{ hoveredDataPoint.windSpeed }} {{ forecast.units.windSpeed }}</span>
 		</template>
 		<template #canvas>

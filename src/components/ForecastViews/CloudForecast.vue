@@ -129,7 +129,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 <template>
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
-			<span class="forecast__details__couverture">Couverture</span>
+			<span class="forecast__details__couverture">{{ $t('Cloud cover') }}</span>
 			<span>{{ hoveredDataPoint.cloudCover }}{{ forecast.units.cloudCover }}</span>
 		</template>
 		<template #canvas>

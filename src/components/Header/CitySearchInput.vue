@@ -117,7 +117,7 @@ function handleGeolocationRequest() {
 <template>
 	<div class="location-input">
 		<v-select class="city-select" :options="foundCities" :filterable="false" v-model="selectedCity"
-			:components="{ Deselect }" :disabled="initialLoading" placeholder="Search a city name. Ex: Paris"
+			:components="{ Deselect }" :disabled="initialLoading" :placeholder="$t('Search a city name. Ex: Paris')"
 			:loading="loading" @open="handleSelectOpen" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
 			<template #no-options> Type to search a city</template>
@@ -125,7 +125,7 @@ function handleGeolocationRequest() {
 				<svg-icon v-if="loading" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			</template>
 		</v-select>
-		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest" aria-label="Use device location">
+		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest" :title="$t('Use device location')" :aria-label="$t('Use device location')">
 			<svg-icon v-if="loadingCurrentLocation" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			<svg-icon v-else type="mdi" :path="mdiCrosshairs"></svg-icon>
 		</button>

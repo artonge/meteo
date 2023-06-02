@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Forecast } from '@/lib/open-meteo';
-import { formatNumber, getMax, getMin } from '@/lib/utils'
+import { getMax, getMin } from '@/lib/utils'
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
 
@@ -90,13 +90,13 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 <template>
 	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
 		<template #detail_1>
-			<span class="forecast__details__temperature">Temperature (ressentie)</span>
-			<span>{{ formatNumber(hoveredDataPoint.temperature) }}{{ forecast.units.temperature }} ({{
-				formatNumber(hoveredDataPoint.apparentTemperature) }}{{ forecast.units.apparentTemperature }})</span>
+			<span class="forecast__details__temperature">{{ $t('Temperature (felt)') }}</span>
+			<span>{{ $n(hoveredDataPoint.temperature, { minimumFractionDigits: 1 }) }}{{ forecast.units.temperature }} ({{
+				$n(hoveredDataPoint.apparentTemperature, { minimumFractionDigits: 1 }) }}{{ forecast.units.apparentTemperature }})</span>
 		</template>
 		<template #detail_2>
-			<span class="forecast__details__precipitation">Précipitations</span>
-			<span>{{ formatNumber(hoveredDataPoint.precipitation) }}{{ forecast.units.precipitation }}</span>
+			<span class="forecast__details__precipitation">{{ $t('Rainfall') }}</span>
+			<span>{{ $n(hoveredDataPoint.precipitation, { minimumFractionDigits: 1 }) }}{{ forecast.units.precipitation }}</span>
 		</template>
 		<template #canvas>
 			<canvas ref="canvas"></canvas>

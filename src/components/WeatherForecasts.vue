@@ -123,21 +123,21 @@ function handlePanelChanged({index}: WillChangeEvent) {
 	<svg-icon v-else type="mdi" :path="mdiLoading" class="loading" :size="64"></svg-icon>
 
 	<nav class="bottom-menu">
-		<button aria-label="Go to temperature chart" @click="flicking?.moveTo(0)" class="menu-item" :class="{selected: currentPanelIndex === 0}">
+		<button :aria-label="$t('Go to {chartName} chart', { chartName: 'temperature' })" @click="flicking?.moveTo(0)" class="menu-item" :class="{selected: currentPanelIndex === 0}">
 			<svg-icon type="mdi" :path="mdiThermometer"></svg-icon>
-			Temperature
+			{{ $t('Temperature') }}
 		</button>
-		<button aria-label="Go to wind chart" @click="flicking?.moveTo(1)" class="menu-item" :class="{selected: currentPanelIndex === 1}">
+		<button :aria-label="$t('Go to {chartName} chart', { chartName: 'wind' })" @click="flicking?.moveTo(1)" class="menu-item" :class="{selected: currentPanelIndex === 1}">
 			<svg-icon type="mdi" :path="mdiWindTurbine"></svg-icon>
-			Wind
+			{{ $t('Wind') }}
 		</button>
-		<button aria-label="Go to cloud chart" @click="flicking?.moveTo(2)" class="menu-item" :class="{selected: currentPanelIndex === 2}">
+		<button :aria-label="$t('Go to {chartName} chart', { chartName: 'cloud' })" @click="flicking?.moveTo(2)" class="menu-item" :class="{selected: currentPanelIndex === 2}">
 			<svg-icon type="mdi" :path="mdiWeatherCloudy"></svg-icon>
-			Cloud
+			{{ $t('Cloud') }}
 		</button>
-		<button aria-label="Go to pressure chart" @click="flicking?.moveTo(3)" class="menu-item" :class="{selected: currentPanelIndex === 3}">
+		<button :aria-label="$t('Go to {chartName} chart', { chartName: 'pressure' })" @click="flicking?.moveTo(3)" class="menu-item" :class="{selected: currentPanelIndex === 3}">
 			<svg-icon type="mdi" :path="mdiWaterOutline"></svg-icon>
-			Pressure
+			{{ $t('Pressure') }}
 		</button>
 	</nav>
 </template>

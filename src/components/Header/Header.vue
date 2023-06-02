@@ -1,6 +1,6 @@
 <template>
 	<header>
-		<img alt="meteo logo" src="@/assets/logo.svg" />
+		<img :alt="$t('Logo of meteo')" src="@/assets/logo.svg" />
 
 		<div class="header__content">
 			<slot></slot>
