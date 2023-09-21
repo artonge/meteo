@@ -60,14 +60,13 @@ async function searchCity(query: string) {
 		return
 	}
 
-	loading.value++
-
 	if (!(await isCitiesIndexLoaded())) {
 		console.debug('Index not loaded, saving query:', query)
 		savedQuery = query
 		return
 	}
 
+	loading.value++
 	foundCities.value = await searchCities(query)
 	console.debug('Found cities:', foundCities.value)
 	loading.value--
