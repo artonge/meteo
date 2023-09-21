@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { Ref } from "vue";
-import type { City } from "@/lib/cities";
+import type { City } from "@/lib/models.js";
 import Header from "@/components/Header/Header.vue";
 import CitySearchInput from "@/components/Header/CitySearchInput.vue";
 import WeatherForecasts from "@/components/WeatherForecasts.vue";
