@@ -80,7 +80,6 @@ export const tickerPlugin: Plugin = {
 	},
 
 	afterDestroy(chart, args, options: TickerOptions) {
-		console.log(options)
 		options.abortController.abort()
 	},
 
