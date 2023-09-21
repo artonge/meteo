@@ -17,7 +17,7 @@ import Deselect from './Deselect.vue'
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
 
 const initialLoading = ref(true)
-const loading = ref(false)
+const loading = ref(0)
 const selectedCity: Ref<City | null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
 const foundCities: Ref<City[]> = ref([])
 const loadingCurrentLocation = ref(false)
@@ -52,7 +52,7 @@ async function searchCity(query: string) {
 		return
 	}
 
-	loading.value = true
+	loading.value++
 
 	if (!(await isCitiesIndexLoaded())) {
 		console.debug('Index not loaded, saving query:', query)
@@ -62,7 +62,7 @@ async function searchCity(query: string) {
 
 	foundCities.value = await searchCities(query)
 	console.debug('Found cities:', foundCities.value)
-	loading.value = false
+	loading.value--
 }
 
 const debouncedSearchCity = debounce(searchCity, 0)
@@ -115,14 +115,15 @@ function handleGeolocationRequest() {
 	<div class="location-input">
 		<v-select class="city-select" :options="foundCities" :filterable="false" v-model="selectedCity"
 			:components="{ Deselect }" :disabled="initialLoading" placeholder="Search a city name. Ex: Paris"
-			:loading="loading" @open="handleSelectOpen" @search="debouncedSearchCity"
+			:loading="loading !== 0" @open="handleSelectOpen" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
 			<template #no-options> Type to search a city</template>
 			<template #spinner="{ loading }">
 				<svg-icon v-if="loading" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			</template>
 		</v-select>
-		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest" aria-label="Use device location">
+		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest"
+			aria-label="Use device location">
 			<svg-icon v-if="loadingCurrentLocation" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			<svg-icon v-else type="mdi" :path="mdiCrosshairs"></svg-icon>
 		</button>
