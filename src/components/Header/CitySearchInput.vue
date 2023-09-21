@@ -25,7 +25,7 @@ const searchResults = computed(() => {
 	if (foundCities.value.length > 0) {
 		return foundCities.value
 	} else {
-		return cityHistory.value.slice(0, 3)
+		return cityHistory.value.slice(0, 5)
 	}
 })
 const loadingCurrentLocation = ref(false)
