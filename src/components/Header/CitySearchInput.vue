@@ -88,8 +88,14 @@ watch(selectedCity, (newValue, oldValue) => {
 	}
 
 	if (selectedCity.value !== null) {
-		if (selectedCity.id !== -1 && cityHistory.value.every(city => city.id !== selectedCity.value.id)) {
-			cityHistory.value.push(selectedCity.value)
+		const index = cityHistory.value.findIndex(city => city.id === selectedCity.value?.id)
+		// Remove any old occurrence of the city in history.
+		if (index !== -1) {
+			cityHistory.value.splice(index, 1)
+		}
+		// Add selection to the top of the history
+		if (selectedCity.value.id !== -1) {
+			cityHistory.value.unshift(selectedCity.value)
 		}
 		foundCities.value = []
 		emits('citySelected', selectedCity.value)
