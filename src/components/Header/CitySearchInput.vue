@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, computed } from 'vue'
 import type { Ref } from 'vue'
 import { StorageSerializers, useStorage, useGeolocation } from '@vueuse/core'
 // @ts-ignore
 import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiLoading, mdiCrosshairs } from '@mdi/js'
+import { mdiLoading, mdiCrosshairs, mdiClose } from '@mdi/js'
 
 import { debounce } from 'debounce'
 import vSelect from 'vue-select'
@@ -17,9 +17,17 @@ import Deselect from './Deselect.vue'
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
 
 const initialLoading = ref(true)
-const loading = ref(false)
+const loading = ref(0)
 const selectedCity: Ref<City | null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
+const cityHistory: Ref<City[]> = useStorage('cityHistory', [], undefined, { serializer: StorageSerializers.object })
 const foundCities: Ref<City[]> = ref([])
+const searchResults = computed(() => {
+	if (foundCities.value.length > 0) {
+		return foundCities.value
+	} else {
+		return cityHistory.value.slice(0, 3)
+	}
+})
 const loadingCurrentLocation = ref(false)
 const { coords, resume, pause, isSupported, error: coordsError } = useGeolocation({ immediate: false })
 
@@ -52,7 +60,7 @@ async function searchCity(query: string) {
 		return
 	}
 
-	loading.value = true
+	loading.value++
 
 	if (!(await isCitiesIndexLoaded())) {
 		console.debug('Index not loaded, saving query:', query)
@@ -62,7 +70,7 @@ async function searchCity(query: string) {
 
 	foundCities.value = await searchCities(query)
 	console.debug('Found cities:', foundCities.value)
-	loading.value = false
+	loading.value--
 }
 
 const debouncedSearchCity = debounce(searchCity, 0)
@@ -81,6 +89,10 @@ watch(selectedCity, (newValue, oldValue) => {
 	}
 
 	if (selectedCity.value !== null) {
+		if (selectedCity.id !== -1 && cityHistory.value.every(city => city.id !== selectedCity.value.id)) {
+			cityHistory.value.push(selectedCity.value)
+		}
+		foundCities.value = []
 		emits('citySelected', selectedCity.value)
 	}
 })
@@ -113,16 +125,25 @@ function handleGeolocationRequest() {
 </script>
 <template>
 	<div class="location-input">
-		<v-select class="city-select" :options="foundCities" :filterable="false" v-model="selectedCity"
+		<v-select class="city-select" :options="searchResults" :filterable="false" v-model="selectedCity"
 			:components="{ Deselect }" :disabled="initialLoading" placeholder="Search a city name. Ex: Paris"
-			:loading="loading" @open="handleSelectOpen" @search="debouncedSearchCity"
+			:loading="loading !== 0" @open="handleSelectOpen" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
+			<template #option="option">
+				{{ option.name }} ({{ option.countryCode }})
+				<button v-if="foundCities.length === 0"
+					@click.prevent="cityHistory.splice(cityHistory.findIndex(city => city.id === option.id), 1)">
+					<svg-icon type="mdi" :path="mdiClose"></svg-icon>
+				</button>
+			</template>
+
 			<template #no-options> Type to search a city</template>
 			<template #spinner="{ loading }">
 				<svg-icon v-if="loading" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			</template>
 		</v-select>
-		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest" aria-label="Use device location">
+		<button v-if="isSupported" class="geolocation-button" @click="handleGeolocationRequest"
+			aria-label="Use device location">
 			<svg-icon v-if="loadingCurrentLocation" type="mdi" :path="mdiLoading" class="loading"></svg-icon>
 			<svg-icon v-else type="mdi" :path="mdiCrosshairs"></svg-icon>
 		</button>
@@ -187,6 +208,7 @@ function handleGeolocationRequest() {
 				padding-top: 0;
 
 				.vs__clear {
+					margin-top: 4px;
 					height: 24px;
 				}
 
@@ -209,11 +231,20 @@ function handleGeolocationRequest() {
 				border-radius: 8px;
 				padding: 4px 8px;
 				border: 2px solid transparent;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
 
 				&--highlight {
 					border: 2px solid var(--color-primary);
 					background-color: var(--color-primary-transparent);
 					color: var(--color-text);
+				}
+
+				button {
+					width: 24px;
+					height: 24px;
+					background-color: transparent;
 				}
 			}
 		}

@@ -70,7 +70,7 @@ const methods = {
 		console.log('Searching city with query: ', searchQuery)
 		const searchArray = searchQuery.toUpperCase().split(' ')
 		return citiesFuse
-			.search(searchQuery, { limit: 20 })
+			.search(searchQuery, { limit: 10 })
 			.sort((a, b) => {
 				// Favorite exact country code match
 				if (a.item.countryCode !== b.item.countryCode) {
