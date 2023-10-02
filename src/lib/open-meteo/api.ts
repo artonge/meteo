@@ -44,14 +44,14 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 	const result = await fetch(url)
 	const forecast = await result.json()
 
-	function getValue(key: string, index: number) {
-		if (forecast.hourly[key] !== undefined && forecast.hourly[key][index] !== null) {
-			return forecast.hourly[key][index]
+	function getValue(key: string, index: number, repetition: string = 'hourly') {
+		if (forecast[repetition][key] !== undefined && forecast[repetition][key][index] !== null) {
+			return forecast[repetition][key][index]
 		} else {
 			for (const model of models) {
 				const modelKey = `${key}_${model}`
-				if (forecast.hourly[modelKey] !== undefined && forecast.hourly[modelKey][index] !== null) {
-					return forecast.hourly[modelKey][index]
+				if (forecast[repetition][modelKey] !== undefined && forecast[repetition][modelKey][index] !== null) {
+					return forecast[repetition][modelKey][index]
 				}
 			}
 		}
@@ -90,8 +90,8 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 		daily: forecast.daily.time.map((timestamp: number, index: number) => {
 			return {
 				time: new Date(timestamp),
-				sunrise: forecast.daily.sunrise[index],
-				sunset: forecast.daily.sunset[index],
+				sunrise: getValue('sunrise', index, 'daily'),
+				sunset: getValue('sunset', index, 'daily'),
 			}
 		}),
 		units: {
