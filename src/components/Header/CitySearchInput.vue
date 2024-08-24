@@ -2,16 +2,15 @@
 import { onMounted, ref, watch, computed } from 'vue'
 import type { Ref } from 'vue'
 import { StorageSerializers, useStorage, useGeolocation } from '@vueuse/core'
-// @ts-ignore
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiLoading, mdiCrosshairs, mdiClose } from '@mdi/js'
 
-import { debounce } from 'debounce'
+import debounce from 'debounce'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
-import { createCitiesIndex, fetchCities, isCitiesIndexLoaded, searchCities } from '@/lib/citiesSearchProxy'
-import type { City } from '@/lib/models'
+import { createCitiesIndex, fetchCities, isCitiesIndexLoaded, searchCities } from '../../lib/citiesSearchProxy'
+import type { City } from '../../lib/models'
 import Deselect from './Deselect.vue'
 
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
@@ -134,7 +133,7 @@ function handleGeolocationRequest() {
 			:components="{ Deselect }" :disabled="initialLoading" placeholder="Search a city name. Ex: Paris"
 			:loading="loading !== 0" @open="handleSelectOpen" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
-			<template #option="option">
+			<template #option="option: City">
 				{{ option.name }} ({{ option.countryCode }})
 				<button v-if="foundCities.length === 0"
 					@click.prevent="cityHistory.splice(cityHistory.findIndex(city => city.id === option.id), 1)">

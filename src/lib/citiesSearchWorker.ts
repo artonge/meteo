@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie'
-import Fuse from 'fuse.js'
+import Fuse, { type FuseIndex } from 'fuse.js'
 import type { City } from './models'
 
 /**
@@ -22,7 +22,7 @@ class CitiesDexie extends Dexie {
 	}
 }
 
-interface RealFuseIndex<T> extends Fuse.FuseIndex<T> {
+interface RealFuseIndex<T> extends FuseIndex<T> {
 	size(): number
 }
 

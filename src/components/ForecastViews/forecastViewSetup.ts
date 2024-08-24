@@ -7,7 +7,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels'
 import zoomPlugin from 'chartjs-plugin-zoom'
 import type { Forecast, HourlyForecast } from '@/lib/open-meteo';
 import { tickerPlugin } from '@/plugins/ticker'
-import { debounce } from 'debounce'
+import debounce from 'debounce'
 
 Chart.register(
 	Filler,
@@ -133,7 +133,7 @@ export function setupForecastView(
 								...dataset,
 								...{ parsing: false } as ParsingOptions,
 								normalized: true,
-								data: dataset.data.map((y, i) => ({ x: props.forecast.hourly[i].time.getTime(), y })),
+								data: dataset.data.map((y, i) => ({ x: props.forecast.hourly[i].time.getTime(), y } as Point)),
 							}
 						}),
 				],

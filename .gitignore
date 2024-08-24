@@ -28,5 +28,11 @@ coverage
 *.sln
 *.sw?
 
+*.tsbuildinfo
+
+test-results/
+playwright-report/
+
+
 # Project's files
 public/cities.json
