@@ -1,7 +1,8 @@
 <template>
 	<header>
-		<img alt="meteo logo" src="@/assets/logo.svg" />
-
+		<RouterLink to="/about">
+			<img alt="meteo logo" src="@/assets/logo.svg" />
+		</RouterLink>
 		<div class="header__content">
 			<slot></slot>
 		</div>

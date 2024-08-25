@@ -1,6 +1,7 @@
-import type { Forecast } from "."
+import { storeToRefs } from 'pinia'
 
-export type { Forecast } from "./index"
+import type { Forecast } from "."
+import { useWeatherModelsStore } from "@/stores/weatherModels"
 
 const endpoint = 'https://api.open-meteo.com/v1/forecast'
 
@@ -23,20 +24,15 @@ const dailyParams = [
 	'sunset',
 ]
 
-const models = [
-	'meteofrance_arome_france_hd',
-	'meteofrance_seamless',
-	'metno_nordic',
-	'best_match',
-]
-
-
 export async function fetchForecast(latitude: number, longitude: number): Promise<Forecast> {
+	const store = useWeatherModelsStore()
+	const { modelsKeys } = storeToRefs(store)
+
 	const url = new URL(endpoint)
 	url.searchParams.append('latitude', latitude.toString())
 	url.searchParams.append('longitude', longitude.toString())
 	url.searchParams.append('hourly', hourlyParams.join(','))
-	url.searchParams.append('models', models.join(','))
+	url.searchParams.append('models', modelsKeys.value.join(','))
 	url.searchParams.append('daily', dailyParams.join(','))
 	url.searchParams.append('current_weather', true.toString())
 	url.searchParams.append('timezone', 'auto')
@@ -48,7 +44,7 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 		if (forecast[repetition][key] !== undefined && forecast[repetition][key][index] !== null) {
 			return forecast[repetition][key][index]
 		} else {
-			for (const model of models) {
+			for (const model of modelsKeys.value) {
 				const modelKey = `${key}_${model}`
 				if (forecast[repetition][modelKey] !== undefined && forecast[repetition][modelKey][index] !== null) {
 					return forecast[repetition][modelKey][index]
@@ -61,7 +57,7 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 		if (forecast.hourly_units[key] !== undefined) {
 			return forecast.hourly_units[key]
 		} else {
-			for (const model of models) {
+			for (const model of modelsKeys.value) {
 				const modelKey = `${key}_${model}`
 				if (forecast.hourly_units[modelKey] !== undefined) {
 					return forecast.hourly_units[modelKey]
