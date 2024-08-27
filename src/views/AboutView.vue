@@ -22,26 +22,28 @@ let drag = false
 	<main>
 		<div class="about-models">
 			<h3>Models</h3>
-			<draggable
-				v-model="models"
-				@update:modelValue="(newlyOrderedModels) => store.setOrder(newlyOrderedModels.map((model: ModelInfo) => model.key))"
-				group="people"
-				@start="drag=true"
-				@end="drag=false"
-				item-key="key">
-					<template #item="{element}">
-						<div>
-							<label>
-								<input type="checkbox" :checked="element.enabled" @change="store.toggleModel(element.key)">
-								{{element.label}}
-							</label>
-						</div>
-					</template>
-			</draggable>
-			<button class="about-models-restore-button" @click="store.resetModels()">
-				<svg-icon type="mdi" :path="mdiRestore"></svg-icon>
-				Restore
-			</button>
+			<div>
+				<draggable
+					v-model="models"
+					@update:modelValue="(newlyOrderedModels) => store.setOrder(newlyOrderedModels.map((model: ModelInfo) => model.key))"
+					group="people"
+					@start="drag=true"
+					@end="drag=false"
+					item-key="key">
+						<template #item="{element}">
+							<div>
+								<label>
+									<input type="checkbox" :checked="element.enabled" @change="store.toggleModel(element.key)">
+									{{element.label}}
+								</label>
+							</div>
+						</template>
+				</draggable>
+				<button class="about-models-restore-button" @click="store.resetModels()">
+					<svg-icon type="mdi" :path="mdiRestore"></svg-icon>
+					Restore
+				</button>
+			</div>
 		</div>
 	</main>
 </template>
@@ -61,12 +63,21 @@ header {
 }
 
 main {
+	height: calc(100dvh - 80px);
+	display: flex;
 	padding: 20px 50px;
+	box-sizing: border-box;
+	overflow: scroll;
+
+	@media only screen and (max-width: 800px) {
+		padding: 10px;
+	}
 
 	.about-models {
 		display: flex;
 		gap: 16px;
 		align-items: start;
+		height: fit-content;
 
 		h3 {
 			margin: 0;
