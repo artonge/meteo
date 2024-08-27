@@ -113,7 +113,7 @@ function handleGeolocationRequest() {
 			<template #option="option: City">
 				{{ option.name }} ({{ option.countryCode }})
 				<button v-if="foundCities.length === 0"
-					@click.prevent="cityHistory.splice(cityHistory.findIndex(city => city.id === option.id), 1)">
+					@click.stop="cityHistory.splice(cityHistory.findIndex(city => city.id === option.id), 1)">
 					<svg-icon type="mdi" :path="mdiClose"></svg-icon>
 				</button>
 			</template>
