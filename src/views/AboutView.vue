@@ -10,7 +10,7 @@ import { mdiRestore } from '@mdi/js';
 import { useWeatherModelsStore } from "@/stores/weatherModels"
 
 const store = useWeatherModelsStore()
-const { modelsDict } = storeToRefs(store)
+const { models } = storeToRefs(store)
 </script>
 <template>
 	<header>
@@ -22,17 +22,22 @@ const { modelsDict } = storeToRefs(store)
 		<div class="about-models">
 			<h3>Models</h3>
 			<draggable
-				v-model="modelsDict"
+				v-model="models"
 				@update:modelValue="(newlyOrderedModels) => store.setOrder(newlyOrderedModels.map(model => model.key))"
 				group="people"
 				@start="drag=true"
 				@end="drag=false"
 				item-key="key">
 					<template #item="{element}">
-						<div>{{element.label}}</div>
+						<div>
+							<label>
+								<input type="checkbox" :checked="element.enabled" @change="store.toggleModel(element.key)">
+								{{element.label}}
+							</label>
+						</div>
 					</template>
 			</draggable>
-			<button class="about-models-restore-button" @click="store.resetOrder()">
+			<button class="about-models-restore-button" @click="store.resetModels()">
 				<svg-icon type="mdi" :path="mdiRestore"></svg-icon>
 				Restore
 			</button>
