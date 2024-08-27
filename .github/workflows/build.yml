@@ -14,7 +14,7 @@ jobs:
       - run: ./scripts/cities.sh
       - run: npm install
       - run: npm run build-only -- --mode dev
-      - uses: actions/upload-pages-artifact@v1.0.7
+      - uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: dist
 
@@ -26,4 +26,4 @@ jobs:
       id-token: write
     steps:
       - name: Publish app
-        uses: actions/deploy-pages@v1.2.3
+        uses: actions/deploy-pages@v4.0.5
