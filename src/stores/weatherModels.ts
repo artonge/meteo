@@ -3,10 +3,10 @@ import { useLocalStorage } from '@vueuse/core'
 
 
 const models = {
+	'best_match': "Best match",
 	'meteofrance_arome_france_hd': "Météo-France AROME France HD",
 	'meteofrance_seamless': "Météo-France Seamless",
 	'metno_nordic': "MET Norway Nordic",
-	'best_match': "Best match",
 }
 
 type ModelKeys = keyof typeof models
@@ -18,9 +18,6 @@ export type ModelInfo = {
 }
 
 const defaultEnabledModels: ModelKeys[] = [
-	'meteofrance_arome_france_hd',
-	'meteofrance_seamless',
-	'metno_nordic',
 	'best_match',
 ]
 
