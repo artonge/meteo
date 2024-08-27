@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import type { Ref } from 'vue'
 import { StorageSerializers, useStorage, useGeolocation } from '@vueuse/core'
 import SvgIcon from '@jamescoyle/vue-icon'
@@ -11,7 +11,7 @@ import 'vue-select/dist/vue-select.css'
 
 import { searchLocation } from '../../lib/open-meteo'
 import type { City } from '../../lib/models'
-import Deselect from './Deselect.vue'
+import DeselectIcon from './DeselectIcon.vue'
 
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
 
@@ -107,7 +107,7 @@ function handleGeolocationRequest() {
 <template>
 	<div class="location-input">
 		<v-select class="city-select" :options="searchResults" :filterable="false" v-model="selectedCity"
-			:components="{ Deselect }" placeholder="Enter a city name. Ex: Paris"
+			:components="{ DeselectIcon }" placeholder="Enter a city name. Ex: Paris"
 			:loading="loading !== 0" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
 			<template #option="option: City">

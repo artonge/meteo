@@ -2,16 +2,16 @@
 import { ref } from "vue";
 import type { Ref } from "vue";
 import type { City } from "@/lib/models.js";
-import Header from "@/components/Header/Header.vue";
+import MainHeader from "@/components/Header/MainHeader.vue";
 import CitySearchInput from "@/components/Header/CitySearchInput.vue";
 import WeatherForecasts from "@/components/WeatherForecasts.vue";
 
 const selectedCity: Ref<City | null> = ref(null);
 </script>
 <template>
-	<Header>
+	<MainHeader>
 		<CitySearchInput @citySelected="(city) => (selectedCity = city)" />
-	</Header>
+	</MainHeader>
 
 	<main>
 		<WeatherForecasts v-if="selectedCity !== null" :city="selectedCity" />
