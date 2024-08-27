@@ -10,6 +10,7 @@ import { useWeatherModelsStore, type ModelInfo } from "@/stores/weatherModels"
 
 const store = useWeatherModelsStore()
 const { models } = storeToRefs(store)
+const buildDate = BUILD_DATE
 
 let drag = false
 </script>
@@ -20,7 +21,7 @@ let drag = false
 		</RouterLink>
 	</header>
 	<main>
-		<div class="about-models">
+		<div class="about-section about-models">
 			<h3>Models</h3>
 			<div>
 				<draggable
@@ -45,6 +46,9 @@ let drag = false
 				</button>
 			</div>
 		</div>
+		<div class="about-section build-date">
+			<h3>Build date</h3> {{ buildDate }}
+		</div>
 	</main>
 </template>
 <style scoped lang="scss">
@@ -63,8 +67,10 @@ header {
 }
 
 main {
-	height: calc(100dvh - 80px);
 	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	height: calc(100dvh - 80px);
 	padding: 20px 50px;
 	box-sizing: border-box;
 	overflow: scroll;
@@ -73,16 +79,18 @@ main {
 		padding: 10px;
 	}
 
-	.about-models {
+	.about-section {
 		display: flex;
-		gap: 16px;
 		align-items: start;
+		gap: 16px;
 		height: fit-content;
 
 		h3 {
 			margin: 0;
 		}
+	}
 
+	.about-models {
 		&-restore-button {
 			display: flex;
 			align-items: center;

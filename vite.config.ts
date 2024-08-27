@@ -42,6 +42,9 @@ export default defineConfig({
 			},
 		})
 	],
+	define: {
+		BUILD_DATE: JSON.stringify(new Date().toDateString())
+	},
 	resolve: {
 		alias: {
 			'@': fileURLToPath(new URL('./src', import.meta.url)),
