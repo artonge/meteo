@@ -1,5 +1,4 @@
 <script setup>
-import { computed, defineModel } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import draggable from 'vuedraggable'

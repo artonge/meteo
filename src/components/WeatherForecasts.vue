@@ -5,7 +5,7 @@ import { ref, watch, onMounted, type Ref } from 'vue'
 import Flicking, { type HoldStartEvent, type MoveStartEvent, type WillChangeEvent } from '@egjs/vue3-flicking'
 import '@egjs/vue3-flicking/dist/flicking.css'
 
-import { fetchForecast, type Forecast } from '@/lib/open-meteo/api'
+import { fetchForecast, type Forecast } from '@/lib/open-meteo'
 import type { City } from '@/lib/models'
 
 import SvgIcon from '@jamescoyle/vue-icon'

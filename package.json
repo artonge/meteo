@@ -23,8 +23,6 @@
     "chartjs-plugin-zoom": "^2.0.1",
     "date-fns": "^3.6.0",
     "debounce": "^2.1.0",
-    "dexie": "^4.0.8",
-    "fuse.js": "^7.0.0",
     "isomorphic-fetch": "^3.0.0",
     "pinia": "^2.2.2",
     "sass": "^1.77.8",

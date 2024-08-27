@@ -2,8 +2,10 @@ import { storeToRefs } from 'pinia'
 
 import type { Forecast } from "."
 import { useWeatherModelsStore } from "@/stores/weatherModels"
+import type { City } from '../models'
 
-const endpoint = 'https://api.open-meteo.com/v1/forecast'
+const forecastEndpoint = 'https://api.open-meteo.com/v1/forecast'
+const locationSearchEndpoint = 'https://geocoding-api.open-meteo.com/v1/search'
 
 const hourlyParams = [
 	'temperature_2m',
@@ -28,16 +30,16 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 	const store = useWeatherModelsStore()
 	const { enabled: enabledModelsKeys } = storeToRefs(store)
 
-	const url = new URL(endpoint)
-	url.searchParams.append('latitude', latitude.toString())
-	url.searchParams.append('longitude', longitude.toString())
-	url.searchParams.append('hourly', hourlyParams.join(','))
-	url.searchParams.append('models', enabledModelsKeys.value.join(','))
-	url.searchParams.append('daily', dailyParams.join(','))
-	url.searchParams.append('current_weather', true.toString())
-	url.searchParams.append('timezone', 'auto')
+	const forecastRequest = new URL(forecastEndpoint)
+	forecastRequest.searchParams.append('latitude', latitude.toString())
+	forecastRequest.searchParams.append('longitude', longitude.toString())
+	forecastRequest.searchParams.append('hourly', hourlyParams.join(','))
+	forecastRequest.searchParams.append('models', enabledModelsKeys.value.join(','))
+	forecastRequest.searchParams.append('daily', dailyParams.join(','))
+	forecastRequest.searchParams.append('current_weather', true.toString())
+	forecastRequest.searchParams.append('timezone', 'auto')
 
-	const result = await fetch(url)
+	const result = await fetch(forecastRequest)
 	const forecast = await result.json()
 
 	function getValue(key: string, index: number, repetition: string = 'hourly') {
@@ -104,4 +106,24 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 			pressureMSL: getUnit('pressure_msl'),
 		}
 	}
+}
+
+export async function searchLocation(query: string): Promise<City[]> {
+	const searchRequest = new URL(locationSearchEndpoint)
+	searchRequest.searchParams.append('name', query)
+	searchRequest.searchParams.append('count', '10')
+
+	const response = await fetch(searchRequest )
+	const { results } = await response.json()
+
+	return results.map((city: any) => {
+		return {
+			id: Number.parseInt(city.id),
+			name: city.name,
+			latitude: city.latitude,
+			longitude: city.longitude,
+			countryCode: city.country_code,
+			population: city.population,
+		}
+	})
 }

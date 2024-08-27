@@ -9,13 +9,12 @@ import debounce from 'debounce'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 
-import { createCitiesIndex, fetchCities, isCitiesIndexLoaded, searchCities } from '../../lib/citiesSearchProxy'
+import { searchLocation } from '../../lib/open-meteo'
 import type { City } from '../../lib/models'
 import Deselect from './Deselect.vue'
 
 const emits = defineEmits<{ (e: 'citySelected', city: City): void }>()
 
-const initialLoading = ref(true)
 const loading = ref(0)
 const selectedCity: Ref<City | null> = useStorage('selectedCity', null, undefined, { serializer: StorageSerializers.object })
 const cityHistory: Ref<City[]> = useStorage('cityHistory', [], undefined, { serializer: StorageSerializers.object })
@@ -38,40 +37,18 @@ if (selectedCity.value !== null) {
 	}
 }
 
-onMounted(async () => {
-	await fetchCities()
-	initialLoading.value = false
-})
-
-
-let savedQuery = ''
-async function handleSelectOpen() {
-	await createCitiesIndex()
-
-	if (savedQuery !== '') {
-		console.debug('Rerun query after index loaded:', savedQuery)
-		searchCity(savedQuery)
-	}
-}
-
 async function searchCity(query: string) {
 	if (query === '') {
 		return
 	}
 
-	if (!(await isCitiesIndexLoaded())) {
-		console.debug('Index not loaded, saving query:', query)
-		savedQuery = query
-		return
-	}
-
 	loading.value++
-	foundCities.value = await searchCities(query)
+	foundCities.value = await searchLocation(query)
 	console.debug('Found cities:', foundCities.value)
 	loading.value--
 }
 
-const debouncedSearchCity = debounce(searchCity, 0)
+const debouncedSearchCity = debounce(searchCity, 500)
 
 watch(selectedCity, (newValue, oldValue) => {
 	console.debug('City selected', selectedCity.value, newValue, oldValue, newValue === oldValue)
@@ -130,8 +107,8 @@ function handleGeolocationRequest() {
 <template>
 	<div class="location-input">
 		<v-select class="city-select" :options="searchResults" :filterable="false" v-model="selectedCity"
-			:components="{ Deselect }" :disabled="initialLoading" placeholder="Search a city name. Ex: Paris"
-			:loading="loading !== 0" @open="handleSelectOpen" @search="debouncedSearchCity"
+			:components="{ Deselect }" placeholder="Enter a city name. Ex: Paris"
+			:loading="loading !== 0" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
 			<template #option="option: City">
 				{{ option.name }} ({{ option.countryCode }})
