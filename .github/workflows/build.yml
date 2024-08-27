@@ -11,7 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - run: ./scripts/cities.sh
       - run: npm install
       - run: npm run build-only -- --mode dev
       - uses: actions/upload-pages-artifact@v3.0.1
