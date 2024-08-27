@@ -11,6 +11,12 @@ const models = {
 
 type ModelKeys = keyof typeof models
 
+export type ModelInfo = {
+	key: ModelKeys
+	label: string
+	enabled: boolean
+}
+
 const defaultEnabledModels: ModelKeys[] = [
 	'meteofrance_arome_france_hd',
 	'meteofrance_seamless',
@@ -24,7 +30,7 @@ export const useWeatherModelsStore = defineStore('weatherModels', {
 		enabled: useLocalStorage('enabledModels', defaultEnabledModels),
 	}),
 	getters: {
-		models(): {key: ModelKeys, label: string, enabled: boolean}[] {
+		models(): ModelInfo[] {
 			return this.order
 				.map(key => ({
 					key,

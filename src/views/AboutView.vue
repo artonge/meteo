@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
 import draggable from 'vuedraggable'
@@ -6,10 +6,12 @@ import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiArrowLeft } from '@mdi/js'
 import { mdiRestore } from '@mdi/js';
 
-import { useWeatherModelsStore } from "@/stores/weatherModels"
+import { useWeatherModelsStore, type ModelInfo } from "@/stores/weatherModels"
 
 const store = useWeatherModelsStore()
 const { models } = storeToRefs(store)
+
+let drag = false
 </script>
 <template>
 	<header>
@@ -22,7 +24,7 @@ const { models } = storeToRefs(store)
 			<h3>Models</h3>
 			<draggable
 				v-model="models"
-				@update:modelValue="(newlyOrderedModels) => store.setOrder(newlyOrderedModels.map(model => model.key))"
+				@update:modelValue="(newlyOrderedModels) => store.setOrder(newlyOrderedModels.map((model: ModelInfo) => model.key))"
 				group="people"
 				@start="drag=true"
 				@end="drag=false"
