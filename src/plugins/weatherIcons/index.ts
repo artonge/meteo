@@ -3,34 +3,48 @@ import type { Plugin } from 'chart.js'
 import type { WeatherIconsOptions } from './index.d'
 import { getWeatherIconName } from '@/lib/open-meteo'
 
+const iconImageCache = new Map<string, HTMLImageElement>()
+
 export const weatherIcons: Plugin = {
 	id: 'weatherIcons',
 
 	afterDraw(chart, args, options: WeatherIconsOptions) {
 		const ctx = chart.ctx
 		const iconWidth = 30
-		let lastPixelDraw = -1
-		let lastDrawPositionIsUp = false
+		let lastPixelDraw: number | undefined = undefined
 
-		options.forecast.hourly.forEach(({ time, weatherCode }, i, a) => {
-			const pixel = chart.scales.x.getPixelForValue(time.getTime())
+		options.forecast.hourly.filter(({ time }) => {
+			const timestamp = time.getTime()
+			const pixel = chart.scales.x.getPixelForValue(timestamp)
 
 			// Prevent icon overlap.
-			if (pixel - lastPixelDraw < iconWidth / 2) {
-				return
+			if (lastPixelDraw !== undefined && Math.abs(pixel - lastPixelDraw) < iconWidth / 2) {
+				return false
 			}
 
-			// Don't draw icons would be partially outside the chart.
-			if (pixel > chart.scales.x.right - iconWidth / 2) {
+			lastPixelDraw = pixel
+			return true
+		}).forEach(({ time, weatherCode }, i) => {
+			const timestamp = time.getTime()
+			const pixel = chart.scales.x.getPixelForValue(timestamp)
+
+			// Don't draw icons that are outside of the canvas.
+			if (pixel < chart.scales.x.left - iconWidth || pixel > chart.scales.x.right + iconWidth) {
 				return
 			}
 
 			const iconName = getWeatherIconName(weatherCode, time)
-			const svg = new Image()
-			svg.src = `/weather-icons/${iconName}.svg`
-			ctx.drawImage(svg, chart.scales.x.getPixelForValue(time.getTime()) - iconWidth / 2, lastDrawPositionIsUp ? 10 : iconWidth + 2, iconWidth, iconWidth)
-			lastPixelDraw = pixel
-			lastDrawPositionIsUp = !lastDrawPositionIsUp
+
+			let svg: HTMLImageElement
+			if (!iconImageCache.has(iconName)) {
+				svg = new Image()
+				svg.src = `/weather-icons/${iconName}.svg`
+				iconImageCache.set(iconName, svg)
+			} else {
+				svg = iconImageCache.get(iconName) as HTMLImageElement
+			}
+
+			ctx.drawImage(svg, pixel - iconWidth / 2, i % 2 ? 10 : iconWidth + 2, iconWidth, iconWidth)
 		})
 	},
 
