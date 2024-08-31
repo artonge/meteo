@@ -130,7 +130,7 @@ export async function searchLocation(query: string): Promise<City[]> {
 	searchRequest.searchParams.append('name', query)
 	searchRequest.searchParams.append('count', '10')
 
-	const response = await fetch(searchRequest )
+	const response = await fetch(searchRequest)
 	const { results } = await response.json()
 
 	return results.map((city: any) => {

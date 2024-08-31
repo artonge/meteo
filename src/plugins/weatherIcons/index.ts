@@ -11,11 +11,17 @@ export const weatherIcons: Plugin = {
 	afterDraw(chart, args, options: WeatherIconsOptions) {
 		const ctx = chart.ctx
 		const iconWidth = 30
+		const firstPixel = chart.scales.x.getPixelForValue(options.forecast.hourly[0].time.getTime())
 		let lastPixelDraw: number | undefined = undefined
 
 		options.forecast.hourly.filter(({ time }) => {
 			const timestamp = time.getTime()
 			const pixel = chart.scales.x.getPixelForValue(timestamp)
+
+			// Prevent first icon to be partially drawn outside of the canvas.
+			if (pixel < firstPixel + iconWidth / 2) {
+				return false
+			}
 
 			// Prevent icon overlap.
 			if (lastPixelDraw !== undefined && Math.abs(pixel - lastPixelDraw) < iconWidth / 2) {
