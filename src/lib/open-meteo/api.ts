@@ -1,6 +1,7 @@
 import { storeToRefs } from 'pinia'
+import { getHours } from 'date-fns'
 
-import type { Forecast } from "."
+import { weatherIconNameMapDay, weatherIconNameMapNight, type Forecast, type WeatherCode } from './models'
 import { useWeatherModelsStore } from "@/stores/weatherModels"
 import type { City } from '../models'
 
@@ -8,14 +9,17 @@ const forecastEndpoint = 'https://api.open-meteo.com/v1/forecast'
 const locationSearchEndpoint = 'https://geocoding-api.open-meteo.com/v1/search'
 
 const hourlyParams = [
+	'weather_code',
 	'temperature_2m',
 	'relativehumidity_2m',
 	'apparent_temperature',
 	'precipitation',
+	'precipitation_probability',
 	'cloudcover',
 	'cloudcover_low',
 	'cloudcover_mid',
 	'cloudcover_high',
+	'visibility',
 	'windspeed_10m',
 	'winddirection_10m',
 	'pressure_msl',
@@ -25,6 +29,17 @@ const dailyParams = [
 	'sunrise',
 	'sunset',
 ]
+
+export function getWeatherIconName(weatherCode: WeatherCode, time: Date): string {
+	const iconName = weatherIconNameMapDay[weatherCode] || 'undefined'
+
+	const hour = getHours(time)
+	if (hour < 6 || hour >= 20) {
+		return weatherIconNameMapNight[weatherCode] || iconName
+	} else {
+		return iconName
+	}
+}
 
 export async function fetchForecast(latitude: number, longitude: number): Promise<Forecast> {
 	const store = useWeatherModelsStore()
@@ -72,6 +87,7 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 		hourly: forecast.hourly.time.map((timestamp: number, index: number) => {
 			return {
 				time: new Date(timestamp),
+				weatherCode: getValue('weather_code', index),
 				temperature: getValue('temperature_2m', index),
 				relativeHumidity: getValue('relativehumidity_2m', index),
 				apparentTemperature: getValue('apparent_temperature', index),
@@ -93,6 +109,7 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 			}
 		}),
 		units: {
+			weatherCode: getUnit('weather_code'),
 			temperature: getUnit('temperature_2m'),
 			relativeHumidity: getUnit('relativehumidity_2m'),
 			apparentTemperature: getUnit('apparent_temperature'),

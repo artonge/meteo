@@ -5,9 +5,10 @@ import { Chart, PointElement, TimeScale, LinearScale, BarController, BarElement,
 import type { ChartDatasetCustomTypesPerDataset, ChartOptions, Point, ParsingOptions } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import zoomPlugin from 'chartjs-plugin-zoom'
+import debounce from 'debounce'
 import type { Forecast, HourlyForecast } from '@/lib/open-meteo';
 import { tickerPlugin } from '@/plugins/ticker'
-import debounce from 'debounce'
+import { weatherIcons } from '@/plugins/weatherIcons'
 
 Chart.register(
 	Filler,
@@ -123,6 +124,7 @@ export function setupForecastView(
 				ChartDataLabels,
 				zoomPlugin,
 				tickerPlugin,
+				weatherIcons,
 			],
 			data: {
 				labels: props.forecast.hourly.map(({ time }) => time),
@@ -251,6 +253,9 @@ export function setupForecastView(
 							emitUpdateTicker(-1)
 							hoveredDataPoint.value = props.forecast.hourly[0]
 						},
+					},
+					weatherIcons: {
+						forecast: props.forecast,
 					},
 				},
 				scales: {
