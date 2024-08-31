@@ -51,16 +51,19 @@ function handleHoldStart(event: HoldStartEvent) {
 		return
 	}
 
-	// Allow swiping to next or previous chart when on edges.
-	if (zoom.value.min === forecast.value?.hourly[0].time.getTime()) {
-		return
-	}
-	if (zoom.value.max === forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime()) {
-		return
-	}
-
-	console.debug("Flicking: abort flick")
 	event.stop()
+	return
+
+	// // Allow swiping to next or previous chart when on edges.
+	// if (zoom.value.min === forecast.value?.hourly[0].time.getTime()) {
+	// 	return
+	// }
+	// if (zoom.value.max === forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime()) {
+	// 	return
+	// }
+
+	// console.debug("Flicking: abort flick")
+	// event.stop()
 }
 
 function handleMoveStart(event: MoveStartEvent) {
@@ -84,15 +87,18 @@ function handleMoveStart(event: MoveStartEvent) {
 		return
 	}
 
-	if (zoom.value.min === forecast.value?.hourly[0].time.getTime() && event.direction === 'NEXT') {
-		console.debug("Flicking: abort flick")
-		event.stop()
-	}
+	event.stop()
+	return
 
-	if (zoom.value.max === forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime() && event.direction === 'PREV') {
-		console.debug("Flicking: abort flick")
-		event.stop()
-	}
+	// if (zoom.value.min === forecast.value?.hourly[0].time.getTime() && event.direction === 'NEXT') {
+	// 	console.debug("Flicking: abort flick")
+	// 	event.stop()
+	// }
+
+	// if (zoom.value.max === forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime() && event.direction === 'PREV') {
+	// 	console.debug("Flicking: abort flick")
+	// 	event.stop()
+	// }
 }
 
 function handlePanelChanged({index}: WillChangeEvent) {
