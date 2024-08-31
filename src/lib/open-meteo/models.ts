@@ -1,42 +1,45 @@
-// TODO: improve mapping
 export const weatherIconNameMapDay = {
-	0: 'clear-day',
-	1: 'mostly-clear-day',
-	2: 'partly-cloudy-day',
-	3: 'mostly-cloudy-day',
+	0: 'clearsky_day',
+	1: 'fair_day',
+	2: 'partlycloudy_day',
+	3: 'cloudy',
 	45: 'fog',
-	48: '',
-	51: 'drizzle',
-	52: '',
-	53: '',
-	56: 'freezingdrizzle',
-	57: '',
-	61: 'rain',
-	63: '',
-	65: '',
-	66: 'freezingrain',
-	67: '',
-	71: 'snow',
-	73: '',
-	75: '',
-	77: '',
-	80: '',
-	81: '',
-	82: '',
-	85: '',
-	86: '',
-	95: '',
-	96: 'thunderstorm',
-	99: '',
+	48: 'fog', // Not accurate
+	51: 'lightrain', // Not accurate
+	52: 'lightrain', // Not accurate
+	53: 'lightrain', // Not accurate
+	56: 'lightsleet', // Not accurate
+	57: 'lightsleet', // Not accurate
+	61: 'lightrain',
+	63: 'rain',
+	65: 'heavyrain',
+	66: 'sleet',
+	67: 'heavysleet',
+	71: 'lightsnow',
+	73: 'snow',
+	75: 'heavysnow',
+	77: 'heavysleet', // Not accurate
+	80: 'lightrainshowers_day',
+	81: 'rainshowers_day',
+	82: 'heavyrainshowers_day',
+	85: 'lightsnowshowers_day',
+	86: 'heavysnowshowers_day',
+	95: 'rainandthunder',
+	96: 'lightsleetandthunder',
+	99: 'heavysleetandthunder',
 }
 
 export type WeatherCode = keyof typeof weatherIconNameMapDay
 
 export const weatherIconNameMapNight: Partial<Record<WeatherCode, string>> = {
-	0: 'clear-night',
-	1: 'mostly-clear-night',
-	2: 'partly-cloudy-night',
-	3: 'mostly-cloudy-night',
+	0: 'clearsky_night',
+	1: 'fair_night',
+	2: 'partlycloudy_night',
+	80: 'lightrainshowers_night',
+	81: 'rainshowers_night',
+	82: 'heavyrainshowers_night',
+	85: 'lightsnowshowers_night',
+	86: 'heavysnowshowers_night',
 }
 
 export interface CurrentWeather {

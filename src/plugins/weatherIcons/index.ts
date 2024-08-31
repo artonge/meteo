@@ -38,6 +38,7 @@ export const weatherIcons: Plugin = {
 			let svg: HTMLImageElement
 			if (!iconImageCache.has(iconName)) {
 				svg = new Image()
+				// Source: https://github.com/metno/weathericons/tree/main
 				svg.src = `/weather-icons/${iconName}.svg`
 				iconImageCache.set(iconName, svg)
 			} else {
@@ -47,7 +48,7 @@ export const weatherIcons: Plugin = {
 			try {
 				ctx.drawImage(svg, pixel - iconWidth / 2, i % 2 ? 10 : iconWidth + 2, iconWidth, iconWidth)
 			} catch (error) {
-				console.error('Failed to draw weather icon:', { error, svg })
+				console.error('Failed to draw weather icon:', { error, svg, weatherCode })
 			}
 		})
 	},
