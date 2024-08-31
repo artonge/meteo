@@ -44,7 +44,11 @@ export const weatherIcons: Plugin = {
 				svg = iconImageCache.get(iconName) as HTMLImageElement
 			}
 
-			ctx.drawImage(svg, pixel - iconWidth / 2, i % 2 ? 10 : iconWidth + 2, iconWidth, iconWidth)
+			try {
+				ctx.drawImage(svg, pixel - iconWidth / 2, i % 2 ? 10 : iconWidth + 2, iconWidth, iconWidth)
+			} catch (error) {
+				console.error('Failed to draw weather icon:', { error, svg })
+			}
 		})
 	},
 
