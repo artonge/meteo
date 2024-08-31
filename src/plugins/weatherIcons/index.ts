@@ -8,38 +8,29 @@ export const weatherIcons: Plugin = {
 
 	afterDraw(chart, args, options: WeatherIconsOptions) {
 		const ctx = chart.ctx
+		const iconWidth = 30
 		let lastPixelDraw = -1
-		let lastIndexDraw = -1
+		let lastDrawPositionIsUp = false
 
 		options.forecast.hourly.forEach(({ time, weatherCode }, i, a) => {
-			// Don't draw the first icon.
-			if (i === 0) {
-				return
-			}
-
-			// Don't draw the same icon twice.
-			if (lastIndexDraw > 0 && a[lastIndexDraw].weatherCode === weatherCode) {
-				return
-			}
-
 			const pixel = chart.scales.x.getPixelForValue(time.getTime())
 
 			// Prevent icon overlap.
-			if (pixel < lastPixelDraw) {
+			if (pixel - lastPixelDraw < iconWidth / 2) {
 				return
 			}
 
 			// Don't draw icons would be partially outside the chart.
-			if (pixel > chart.scales.x.right - 30) {
+			if (pixel > chart.scales.x.right - iconWidth / 2) {
 				return
 			}
 
 			const iconName = getWeatherIconName(weatherCode, time)
 			const svg = new Image()
-			svg.src = `/public/weather-icons/${iconName}.svg`
-			ctx.drawImage(svg, chart.scales.x.getPixelForValue(time.getTime()), 10, 30, 30)
-			lastPixelDraw = pixel + 40
-			lastIndexDraw = i
+			svg.src = `/weather-icons/${iconName}.svg`
+			ctx.drawImage(svg, chart.scales.x.getPixelForValue(time.getTime()) - iconWidth / 2, lastDrawPositionIsUp ? 10 : iconWidth + 2, iconWidth, iconWidth)
+			lastPixelDraw = pixel
+			lastDrawPositionIsUp = !lastDrawPositionIsUp
 		})
 	},
 

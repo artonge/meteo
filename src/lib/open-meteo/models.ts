@@ -1,3 +1,4 @@
+// TODO: improve mapping
 export const weatherIconNameMapDay = {
 	0: 'clear-day',
 	1: 'mostly-clear-day',
