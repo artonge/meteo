@@ -32,6 +32,7 @@ const flicking: Ref<Flicking | null> = ref(null)
 
 watch(() => props.city, () => _fetchForecast(props.city.latitude, props.city.longitude))
 onMounted(async () => await _fetchForecast(props.city.latitude, props.city.longitude))
+watch(() => forecast.value, () => currentPanelIndex.value = 0)
 
 async function _fetchForecast(latitude: number, longitude: number) {
 	forecast.value = null
