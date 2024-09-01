@@ -74,6 +74,12 @@ export const useWeatherModelsStore = defineStore('weatherModels', {
 		modelsKeys(): ModelKeys[] {
 			return this.order
 		},
+		enabledModels(): ModelInfo[] {
+			return this.models.filter(({ enabled }) => enabled)
+		},
+		disabledModels(): ModelInfo[] {
+			return this.models.filter(({ enabled }) => !enabled)
+		},
 	},
 	actions: {
 		setOrder(newOrder: ModelKeys[]) {
