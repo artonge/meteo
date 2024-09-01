@@ -48,6 +48,7 @@ export async function fetchForecast(latitude: number, longitude: number): Promis
 	const forecastRequest = new URL(forecastEndpoint)
 	forecastRequest.searchParams.append('latitude', latitude.toString())
 	forecastRequest.searchParams.append('longitude', longitude.toString())
+	forecastRequest.searchParams.append('forecast_days', '10')
 	forecastRequest.searchParams.append('hourly', hourlyParams.join(','))
 	forecastRequest.searchParams.append('models', enabledModelsKeys.value.join(','))
 	forecastRequest.searchParams.append('daily', dailyParams.join(','))
