@@ -2,6 +2,7 @@
 import type { Forecast } from '@/lib/open-meteo';
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
+import { getPrecipitationChart, getPrecipitationScale } from './precipitationChart';
 
 const props = defineProps<{
 	forecast: Forecast,
@@ -110,17 +111,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		// 		display: false,
 		// 	},
 		// },
-		{
-			type: 'bar',
-			label: `Precipitation over the last hour`,
-			data: forecast.hourly.map(({ precipitation }) => precipitation),
-			barThickness: 'flex',
-			backgroundColor: 'rgba(0, 145, 205, 0.5)',
-			yAxisID: 'yp',
-			datalabels: {
-				display: false,
-			},
-		},
+		getPrecipitationChart(forecast),
 	],
 	() => {
 		return {
@@ -144,12 +135,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			// 	max: 110,
 			// 	min: -520,
 			// },
-			yp: {
-				display: false,
-				position: 'right',
-				max: 8,
-				beginAtZero: true,
-			},
+			...getPrecipitationScale(),
 		}
 	},
 )

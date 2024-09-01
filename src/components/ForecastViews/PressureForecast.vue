@@ -3,6 +3,7 @@ import type { Forecast } from '@/lib/open-meteo';
 import { formatNumber, getMax, getMin } from '@/lib/utils'
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
+import { getPrecipitationChart, getPrecipitationScale } from './precipitationChart';
 
 const props = defineProps<{
 	forecast: Forecast,
@@ -45,19 +46,9 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			borderColor: 'rgba(253, 92, 99, 0.8)',
 			backgroundColor: 'rgba(253, 92, 99, 0.2)',
 			fill: 'origin',
-			yAxisID: 'yp',
-		},
-		{
-			type: 'bar',
-			label: `Precipitation over the last hour`,
-			data: forecast.hourly.map(({ precipitation }) => precipitation),
-			barThickness: 'flex',
-			backgroundColor: 'rgba(0, 145, 205, 0.7)',
 			yAxisID: 'ypr',
-			datalabels: {
-				display: false,
-			},
 		},
+		getPrecipitationChart(forecast),
 	],
 	(forecast: Forecast) => {
 		const minHumidity = getMin(forecast.hourly, ({ relativeHumidity }) => relativeHumidity)
@@ -72,18 +63,13 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 				max: maxHumidity + minHumidity,
 				min: -50,
 			},
-			yp: {
+			ypr: {
 				display: false,
 				beginAtZero: true,
 				max: maxPressure + 50,
 				min: minPressure - 20,
 			},
-			ypr: {
-				display: false,
-				position: 'right',
-				max: 8,
-				beginAtZero: true,
-			},
+			...getPrecipitationScale(),
 		}
 	}
 )

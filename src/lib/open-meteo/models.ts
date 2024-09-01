@@ -8,6 +8,7 @@ export const weatherIconNameMapDay = {
 	51: 'lightrain', // Not accurate
 	52: 'lightrain', // Not accurate
 	53: 'lightrain', // Not accurate
+	55: 'lightrain', // Not accurate
 	56: 'lightsleet', // Not accurate
 	57: 'lightsleet', // Not accurate
 	61: 'lightrain',
@@ -57,6 +58,7 @@ export interface HourlyForecast {
 	relativeHumidity: number
 	apparentTemperature: number
 	precipitation: number
+	precipitationProbability: number
 	cloudCover: number
 	cloudCoverLow: number
 	cloudCoverMid: number
@@ -78,6 +80,7 @@ export interface Units {
 	relativeHumidity: '%'
 	apparentTemperature: '°C'
 	precipitation: 'mm'
+	precipitationProbability: '%'
 	cloudCover: '%'
 	cloudCoverLow: '%'
 	cloudCoverMid: '%'

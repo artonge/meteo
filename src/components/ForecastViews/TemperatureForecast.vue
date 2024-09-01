@@ -3,6 +3,7 @@ import type { Forecast } from '@/lib/open-meteo';
 import { formatNumber, getMax, getMin } from '@/lib/utils'
 import ForecastLayout from './ForecastLayout.vue'
 import { setupForecastView } from './forecastViewSetup'
+import { getPrecipitationChart, getPrecipitationScale } from './precipitationChart';
 
 const props = defineProps<{
 	forecast: Forecast,
@@ -54,17 +55,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 				fill: "start",
 				yAxisID: 'yt',
 			},
-			{
-				type: 'bar',
-				label: `Precipitations over the last hour`,
-				data: forecast.hourly.map(({ precipitation }) => precipitation),
-				barThickness: 'flex',
-				backgroundColor: 'rgba(0, 145, 205, 0.7)',
-				yAxisID: 'yp',
-				datalabels: {
-					display: false,
-				}
-			},
+			getPrecipitationChart(forecast),
 		]
 	},
 	(forecast: Forecast) => {
@@ -78,11 +69,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 				suggestedMin: min - (max - min) * 2,
 				beginAtZero: true,
 			},
-			yp: {
-				display: false,
-				max: 8,
-				beginAtZero: true,
-			},
+			...getPrecipitationScale(),
 		}
 	}
 )
@@ -95,8 +82,8 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 				formatNumber(hoveredDataPoint.apparentTemperature) }}{{ forecast.units.apparentTemperature }})</span>
 		</template>
 		<template #detail_2>
-			<span class="forecast__details__precipitation">Précipitations</span>
-			<span>{{ formatNumber(hoveredDataPoint.precipitation) }}{{ forecast.units.precipitation }}</span>
+			<span class="forecast__details__precipitation">Précipitations (probability)</span>
+			<span>{{ formatNumber(hoveredDataPoint.precipitation) }}{{ forecast.units.precipitation }} ({{ formatNumber(hoveredDataPoint.precipitationProbability) }}{{ forecast.units.precipitationProbability }})</span>
 		</template>
 		<template #canvas>
 			<canvas ref="canvas"></canvas>
