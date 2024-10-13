@@ -84,7 +84,7 @@ export const tickerPlugin: Plugin = {
 	},
 
 	defaults: {
-		color: '#e7be19',
+		color: '#a51616',
 		width: 2,
 	},
 }
