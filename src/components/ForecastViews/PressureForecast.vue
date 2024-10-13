@@ -36,7 +36,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 			borderColor: 'rgba(100, 100, 100, 0.8)',
 			backgroundColor: 'rgba(200, 200, 200, 0.8)',
 			fill: 'origin',
-			yAxisID: 'yp',
+			yAxisID: 'ypr',
 		},
 		{
 			type: 'line',

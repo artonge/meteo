@@ -21,6 +21,16 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 	(forecast: Forecast) => [
 		{
 			type: 'line',
+			label: 'Past cloud cover',
+			data: [...forecast.hourly.map(({ cloudCover }) => cloudCover).filter((_, i) => props.forecast.hourly[i].time.getTime() < Date.now())],
+			cubicInterpolationMode: 'monotone',
+			borderColor: 'rgba(100, 100, 100, 0.8)',
+			backgroundColor: 'rgba(200, 200, 200, 0.8)',
+			fill: "origin",
+			yAxisID: 'yc0',
+		},
+		{
+			type: 'line',
 			label: 'Cloud cover',
 			data: forecast.hourly.map(({ cloudCover }) => cloudCover),
 			cubicInterpolationMode: 'monotone',
@@ -59,6 +69,16 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		// 	fill: 'origin',
 		// 	yAxisID: 'yc3',
 		// },
+		{
+			type: 'line',
+			label: 'Past cloud cover',
+			data: [...forecast.hourly.map(({ cloudCover }) => -cloudCover).filter((_, i) => props.forecast.hourly[i].time.getTime() < Date.now())],
+			cubicInterpolationMode: 'monotone',
+			borderColor: 'rgba(100, 100, 100, 0.8)',
+			backgroundColor: 'rgba(200, 200, 200, 0.8)',
+			fill: "origin",
+			yAxisID: 'yc0',
+		},
 		{
 			type: 'line',
 			label: 'Cloud cover',
