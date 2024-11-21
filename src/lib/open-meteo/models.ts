@@ -58,6 +58,9 @@ export interface HourlyForecast {
 	relativeHumidity: number
 	apparentTemperature: number
 	precipitation: number
+	rain: number
+	showers: number
+	snowfall: number
 	precipitationProbability: number
 	cloudCover: number
 	cloudCoverLow: number
@@ -80,6 +83,9 @@ export interface Units {
 	relativeHumidity: '%'
 	apparentTemperature: '°C'
 	precipitation: 'mm'
+	rain: 'mm'
+	showers: 'mm'
+	snowfall: 'mm'
 	precipitationProbability: '%'
 	cloudCover: '%'
 	cloudCoverLow: '%'
