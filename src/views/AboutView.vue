@@ -8,9 +8,11 @@ import { mdiArrowLeft, mdiClose, mdiDragHorizontal, mdiPlus, mdiTrashCan } from 
 import { mdiRestore } from '@mdi/js';
 
 import { useWeatherModelsStore, type ModelInfo } from "@/stores/weatherModels"
+import { useConfigStore } from "@/stores/config"
 
-const store = useWeatherModelsStore()
-const { enabledModels, disabledModels } = storeToRefs(store)
+const weatherModelStore = useWeatherModelsStore()
+const configStore = useConfigStore()
+const { enabledModels, disabledModels } = storeToRefs(weatherModelStore)
 const buildDate = BUILD_DATE
 
 const addModelDialog: Ref<HTMLDialogElement | null> = ref(null)
@@ -29,7 +31,7 @@ let drag: boolean = false
 			<div>
 				<draggable
 					v-model="enabledModels"
-					@update:modelValue="(newlyOrderedModels) => store.setOrder(newlyOrderedModels.map((model: ModelInfo) => model.key))"
+					@update:modelValue="(newlyOrderedModels: ModelInfo[]) => weatherModelStore.setOrder(newlyOrderedModels.map((model: ModelInfo) => model.key))"
 					group="people"
 					@start="drag=true"
 					@end="drag=false"
@@ -38,7 +40,7 @@ let drag: boolean = false
 							<div class="models__enabled-model">
 								<button class="models__enabled-model__drag-button"><svg-icon type="mdi" :path="mdiDragHorizontal"></svg-icon></button>
 								<span class="models__enabled-model__label">{{element.label}}</span>
-								<button class="models__enabled-model__remove-button" @click="store.toggleModel(element.key)"><svg-icon type="mdi" :path="mdiTrashCan"></svg-icon></button>
+								<button class="models__enabled-model__remove-button" @click="weatherModelStore.toggleModel(element.key)"><svg-icon type="mdi" :path="mdiTrashCan"></svg-icon></button>
 							</div>
 						</template>
 				</draggable>
@@ -47,7 +49,7 @@ let drag: boolean = false
 					<svg-icon type="mdi" :path="mdiPlus"></svg-icon>
 					Add
 				</button>
-				<button class="models__restore-button" @click="store.resetModels()">
+				<button class="models__restore-button" @click="weatherModelStore.resetModels()">
 					<svg-icon type="mdi" :path="mdiRestore"></svg-icon>
 					Restore
 				</button>
@@ -57,10 +59,16 @@ let drag: boolean = false
 					<div class="models__add-model-dialog__models-list">
 						<div class="models__add-model-dialog__available-model" v-for="model in disabledModels" :key="model.key">
 							{{ model.label }}
-							<button @click="store.toggleModel(model.key)"><svg-icon type="mdi" :path="mdiPlus"></svg-icon></button>
+							<button @click="weatherModelStore.toggleModel(model.key)"><svg-icon type="mdi" :path="mdiPlus"></svg-icon></button>
 						</div>
 					</div>
 				</dialog>
+			</div>
+		</div>
+		<div class="about-section build-date">
+			<h3>Forecast length</h3>
+			<div>
+				<input type="number" v-model.number="configStore.forecastLength" min="1" max="16" /> days
 			</div>
 		</div>
 		<div class="about-section build-date">

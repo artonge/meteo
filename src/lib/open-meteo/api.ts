@@ -44,14 +44,14 @@ export function getWeatherIconName(weatherCode: WeatherCode, time: Date): string
 	}
 }
 
-export async function fetchForecast(latitude: number, longitude: number): Promise<Forecast> {
+export async function fetchForecast(latitude: number, longitude: number, count: number): Promise<Forecast> {
 	const store = useWeatherModelsStore()
 	const { enabled: enabledModelsKeys } = storeToRefs(store)
 
 	const forecastRequest = new URL(forecastEndpoint)
 	forecastRequest.searchParams.append('latitude', latitude.toString())
 	forecastRequest.searchParams.append('longitude', longitude.toString())
-	forecastRequest.searchParams.append('forecast_days', '10')
+	forecastRequest.searchParams.append('forecast_days', count.toString())
 	forecastRequest.searchParams.append('hourly', hourlyParams.join(','))
 	forecastRequest.searchParams.append('models', enabledModelsKeys.value.join(','))
 	forecastRequest.searchParams.append('daily', dailyParams.join(','))

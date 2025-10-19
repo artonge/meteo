@@ -18,6 +18,8 @@ import TemperatureForecast from './ForecastViews/TemperatureForecast.vue'
 import CloudForecast from './ForecastViews/CloudForecast.vue'
 import PressureForecast from './ForecastViews/PressureForecast.vue'
 import WindForecast from './ForecastViews/WindForecast.vue'
+import { useConfigStore } from '@/stores/config'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps<{ city: City }>()
 const forecast: Ref<Forecast | null> = ref(null)
@@ -30,13 +32,16 @@ const ticker = ref(0)
 const currentPanelIndex = ref(0)
 const flicking: Ref<Flicking | null> = ref(null)
 
+const configStore = useConfigStore()
+const { forecastLength } = storeToRefs(configStore)
+
 watch(() => props.city, () => _fetchForecast(props.city.latitude, props.city.longitude))
 onMounted(async () => await _fetchForecast(props.city.latitude, props.city.longitude))
 watch(() => forecast.value, () => currentPanelIndex.value = 0)
 
 async function _fetchForecast(latitude: number, longitude: number) {
 	forecast.value = null
-	forecast.value = await fetchForecast(latitude, longitude)
+	forecast.value = await fetchForecast(latitude, longitude, forecastLength.value)
 }
 
 function handleHoldStart(event: HoldStartEvent) {
