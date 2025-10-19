@@ -45,12 +45,19 @@ async function _fetchForecast(latitude: number, longitude: number) {
 }
 
 function handleHoldStart(event: HoldStartEvent) {
+	const firstHourlyForecast = forecast.value?.hourly[0]
+	const lastHourlyForecast = forecast.value?.hourly[forecast.value.hourly.length - 1]
+
+	if (firstHourlyForecast === undefined || lastHourlyForecast === undefined) {
+		return
+	}
+
 	console.debug('Flicking: hold start', {
 		...zoom.value,
-		dataMin: forecast.value?.hourly[0].time.getTime(),
-		dataMax: forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime(),
-		isMin: zoom.value.min === forecast.value?.hourly[0].time.getTime(),
-		isMax: zoom.value.max === forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime(),
+		dataMin: firstHourlyForecast.time.getTime(),
+		dataMax: lastHourlyForecast.time.getTime(),
+		isMin: zoom.value.min === firstHourlyForecast.time.getTime(),
+		isMax: zoom.value.max === lastHourlyForecast.time.getTime(),
 	})
 	// Allow swiping to next or previous chart when not zoomed.
 	if (zoom.value.scale === 1) {
@@ -73,14 +80,21 @@ function handleHoldStart(event: HoldStartEvent) {
 }
 
 function handleMoveStart(event: MoveStartEvent) {
+	const firstHourlyForecast = forecast.value?.hourly[0]
+	const lastHourlyForecast = forecast.value?.hourly[forecast.value.hourly.length - 1]
+
+	if (firstHourlyForecast === undefined || lastHourlyForecast === undefined) {
+		return
+	}
+
 	console.debug('Flicking: move start', {
 		...zoom.value,
 		event,
-		dataMin: forecast.value?.hourly[0].time.getTime(),
-		dataMax: forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime(),
+		dataMin: firstHourlyForecast.time.getTime(),
+		dataMax: lastHourlyForecast.time.getTime(),
 		direction: event.direction,
-		isMin: zoom.value.min === forecast.value?.hourly[0].time.getTime(),
-		isMax: zoom.value.max === forecast.value?.hourly[forecast.value.hourly.length - 1].time.getTime(),
+		isMin: zoom.value.min === firstHourlyForecast.time.getTime(),
+		isMax: zoom.value.max === lastHourlyForecast.time.getTime(),
 	})
 
 	// Allow swiping to next or previous chart when not zoomed.
@@ -107,7 +121,7 @@ function handleMoveStart(event: MoveStartEvent) {
 	// }
 }
 
-function handlePanelChanged({index}: WillChangeEvent) {
+function handlePanelChanged({ index }: WillChangeEvent) {
 	currentPanelIndex.value = index
 }
 </script>
@@ -135,19 +149,19 @@ function handlePanelChanged({index}: WillChangeEvent) {
 	<svg-icon v-else type="mdi" :path="mdiLoading" class="loading" :size="64"></svg-icon>
 
 	<nav class="bottom-menu">
-		<button aria-label="Go to temperature chart" @click="flicking?.moveTo(0)" class="menu-item" :class="{selected: currentPanelIndex === 0}">
+		<button aria-label="Go to temperature chart" @click="flicking?.moveTo(0)" class="menu-item" :class="{ selected: currentPanelIndex === 0 }">
 			<svg-icon type="mdi" :path="mdiThermometer"></svg-icon>
 			Temperature
 		</button>
-		<button aria-label="Go to wind chart" @click="flicking?.moveTo(1)" class="menu-item" :class="{selected: currentPanelIndex === 1}">
+		<button aria-label="Go to wind chart" @click="flicking?.moveTo(1)" class="menu-item" :class="{ selected: currentPanelIndex === 1 }">
 			<svg-icon type="mdi" :path="mdiWindTurbine"></svg-icon>
 			Wind
 		</button>
-		<button aria-label="Go to cloud chart" @click="flicking?.moveTo(2)" class="menu-item" :class="{selected: currentPanelIndex === 2}">
+		<button aria-label="Go to cloud chart" @click="flicking?.moveTo(2)" class="menu-item" :class="{ selected: currentPanelIndex === 2 }">
 			<svg-icon type="mdi" :path="mdiWeatherCloudy"></svg-icon>
 			Cloud
 		</button>
-		<button aria-label="Go to pressure chart" @click="flicking?.moveTo(3)" class="menu-item" :class="{selected: currentPanelIndex === 3}">
+		<button aria-label="Go to pressure chart" @click="flicking?.moveTo(3)" class="menu-item" :class="{ selected: currentPanelIndex === 3 }">
 			<svg-icon type="mdi" :path="mdiWaterOutline"></svg-icon>
 			Pressure
 		</button>

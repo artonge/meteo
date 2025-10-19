@@ -37,7 +37,7 @@ export function setupForecastView(
 ) {
 	const canvas: Ref<HTMLCanvasElement | null> = ref(null)
 	const chart: Ref<Chart | null> = ref(null)
-	const hoveredDataPoint: Ref<HourlyForecast | null> = ref(null)
+	const hoveredDataPoint: Ref<HourlyForecast | undefined> = ref(undefined)
 
 	onMounted(() => {
 		createChart()
@@ -80,9 +80,14 @@ export function setupForecastView(
 			console.debug('automated zoom to', { ...props.zoom })
 
 			const xScale = chart.value.scales[chart.value.getDatasetMeta(0).xAxisID as string]
+
+			if (xScale === undefined) {
+				return
+			}
+
 			chart.value.resetZoom()
 			chart.value.zoom({ x: zoomValue.scale })
-			chart.value.pan({ x: xScale.getPixelForValue(chart.value.scales.x.min) - xScale.getPixelForValue(zoomValue.min) })
+			chart.value.pan({ x: xScale.getPixelForValue(chart.value.scales.x!.min) - xScale.getPixelForValue(zoomValue.min) })
 		})
 	})
 
@@ -90,7 +95,7 @@ export function setupForecastView(
 	const debouncedEmitUpdateTicker = debounce(emitUpdateTicker, 100)
 
 	const debouncedEmitUpdateZoom = debounce(function emitUpdateZoom(chart: Chart): void {
-		if (canvas.value?.getBoundingClientRect().x !== 0) {
+		if (canvas.value?.getBoundingClientRect().x !== 0 || chart.scales.x === undefined) {
 			return
 		}
 
@@ -105,6 +110,10 @@ export function setupForecastView(
 	}, 100)
 
 	function updateHoveredDataPoint(chart: Chart, x: number) {
+		if (chart.scales.x === undefined) {
+			return
+		}
+
 		const timestamp = chart.scales.x.getValueForPixel(x) as number
 		const index = props.forecast.hourly.findIndex(dataPoint => dataPoint.time.getTime() > timestamp)
 		hoveredDataPoint.value = props.forecast.hourly[index - 1] ?? props.forecast.hourly[0]
@@ -135,7 +144,7 @@ export function setupForecastView(
 								...dataset,
 								...{ parsing: false } as ParsingOptions,
 								normalized: true,
-								data: dataset.data.map((y, i) => ({ x: props.forecast.hourly[i].time.getTime(), y } as Point)),
+								data: dataset.data.map((y, i) => ({ x: props.forecast.hourly[i]!.time.getTime(), y } as Point)),
 							}
 						}),
 				],
@@ -168,14 +177,19 @@ export function setupForecastView(
 							}
 
 							const { x: time, y: value } = (context.dataset.data[context.dataIndex] as Point)
+
+							if (time === null || value === null) {
+								return false
+							}
+
 							const start = startOfDay(time).getTime()
 							const end = start + 1000 * 60 * 60 * 24
-							const pointsForDay = (context.dataset.data as Point[]).filter(({ x }) => start < x && x <= end)
+							const pointsForDay = (context.dataset.data as Point[]).filter(({ x }) => start < x! && x! <= end)
 							const valuesForDay = pointsForDay.map(p => p.y)
-							const currentIndex = pointsForDay.findIndex(p => (p as Point).x === time)
+							const currentIndex = pointsForDay.findIndex(p => p.x === time)
 
-							const isHightest = !valuesForDay.some(dataPointValue => dataPointValue > value)
-							const isLowest = !valuesForDay.some(dataPointValue => dataPointValue < value)
+							const isHightest = !valuesForDay.some(dataPointValue => dataPointValue! > value)
+							const isLowest = !valuesForDay.some(dataPointValue => dataPointValue! < value)
 							const isUniq = valuesForDay.filter(dataPointValue => dataPointValue === value).length === 1
 							const isFirst = valuesForDay.findIndex(dataPointValue => dataPointValue === value) === currentIndex
 
@@ -189,7 +203,10 @@ export function setupForecastView(
 							scaleMode: 'x',
 							// Do not pan when not zoomed or when at the edge of the chart.
 							onPanStart({ chart, event }) {
-								if (chart.getZoomLevel() === 1) {
+								const firstHourlyForecast = props.forecast?.hourly[0]
+								const lastHourlyForecast = props.forecast?.hourly[props.forecast.hourly.length - 1]
+
+								if (chart.getZoomLevel() === 1 || firstHourlyForecast === undefined || lastHourlyForecast === undefined) {
 									return false
 								}
 
@@ -197,8 +214,8 @@ export function setupForecastView(
 
 								console.debug('pan start', event.type, {
 									...props.zoom,
-									dataMin: props.forecast?.hourly[0].time.getTime(),
-									dataMax: props.forecast?.hourly[props.forecast.hourly.length - 1].time.getTime(),
+									dataMin: firstHourlyForecast.time.getTime(),
+									dataMax: lastHourlyForecast.time.getTime(),
 									direction: direction,
 								})
 
@@ -207,12 +224,12 @@ export function setupForecastView(
 									return false
 								}
 
-								if (props.zoom.min === props.forecast.hourly[0].time.getTime() && direction !== 2) {
+								if (props.zoom.min === firstHourlyForecast.time.getTime() && direction !== 2) {
 									console.debug("abort pan - edge")
 									return false
 								}
 
-								if (props.zoom.max === props.forecast.hourly[props.forecast.hourly.length - 1].time.getTime() && direction !== 4) {
+								if (props.zoom.max === lastHourlyForecast.time.getTime() && direction !== 4) {
 									console.debug("abort pan")
 									return false
 								}

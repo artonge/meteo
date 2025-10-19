@@ -110,7 +110,7 @@ function handleGeolocationRequest() {
 			:components="{ DeselectIcon }" placeholder="Enter a city name. Ex: Paris"
 			:loading="loading !== 0" @search="debouncedSearchCity"
 			:getOptionLabel="(city: City) => `${city.name} (${city.countryCode})`">
-			<template #option="option: City">
+			<template #option="option">
 				{{ option.name }} ({{ option.countryCode }})
 				<button v-if="foundCities.length === 0"
 					@click.stop="cityHistory.splice(cityHistory.findIndex(city => city.id === option.id), 1)">

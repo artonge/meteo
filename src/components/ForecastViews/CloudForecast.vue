@@ -22,7 +22,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Past cloud cover',
-			data: [...forecast.hourly.map(({ cloudCover }) => cloudCover).filter((_, i) => props.forecast.hourly[i].time.getTime() < Date.now())],
+			data: [...forecast.hourly.map(({ cloudCover }) => cloudCover).filter((_, i) => props.forecast.hourly[i]!.time.getTime() < Date.now())],
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(100, 100, 100, 0.8)',
 			backgroundColor: 'rgba(200, 200, 200, 0.8)',
@@ -72,7 +72,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 		{
 			type: 'line',
 			label: 'Past cloud cover',
-			data: [...forecast.hourly.map(({ cloudCover }) => -cloudCover).filter((_, i) => props.forecast.hourly[i].time.getTime() < Date.now())],
+			data: [...forecast.hourly.map(({ cloudCover }) => -cloudCover).filter((_, i) => props.forecast.hourly[i]!.time.getTime() < Date.now())],
 			cubicInterpolationMode: 'monotone',
 			borderColor: 'rgba(100, 100, 100, 0.8)',
 			backgroundColor: 'rgba(200, 200, 200, 0.8)',
@@ -161,7 +161,7 @@ const { hoveredDataPoint, canvas } = setupForecastView(
 )
 </script>
 <template>
-	<ForecastLayout v-if="hoveredDataPoint !== null" :time="hoveredDataPoint.time">
+	<ForecastLayout v-if="hoveredDataPoint !== undefined" :time="hoveredDataPoint.time">
 		<template #detail_1>
 			<span class="forecast__details__couverture">Couverture</span>
 			<span>{{ hoveredDataPoint.cloudCover }}{{ forecast.units.cloudCover }}</span>

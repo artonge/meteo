@@ -5,7 +5,7 @@ function handlePointerEvent(chart: Chart, options: TickerOptions, event: Pointer
 	const y = event.offsetY
 	const x = event.offsetX
 
-	if (touchCanceled) {
+	if (touchCanceled || chart.scales.x === undefined) {
 		return
 	}
 
@@ -37,6 +37,10 @@ function handlePointerEvent(chart: Chart, options: TickerOptions, event: Pointer
 
 function drawTraceLine(chart: Chart, options: TickerOptions, x: number) {
 	const yScale = chart.scales[chart.getDatasetMeta(0).yAxisID as string]
+
+	if (chart.scales.x === undefined || yScale === undefined) {
+		return
+	}
 
 	chart.draw()
 	chart.ctx.beginPath()

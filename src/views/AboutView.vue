@@ -17,7 +17,7 @@ const buildDate = BUILD_DATE
 
 const addModelDialog: Ref<HTMLDialogElement | null> = ref(null)
 
-let drag: boolean = false
+let drag = ref<boolean>(false)
 </script>
 <template>
 	<header>
@@ -33,13 +33,13 @@ let drag: boolean = false
 					v-model="enabledModels"
 					@update:modelValue="(newlyOrderedModels: ModelInfo[]) => weatherModelStore.setOrder(newlyOrderedModels.map((model: ModelInfo) => model.key))"
 					group="people"
-					@start="drag=true"
-					@end="drag=false"
+					@start="drag = true"
+					@end="drag = false"
 					item-key="key">
-						<template #item="{element}">
+						<template #item="{ element }">
 							<div class="models__enabled-model">
 								<button class="models__enabled-model__drag-button"><svg-icon type="mdi" :path="mdiDragHorizontal"></svg-icon></button>
-								<span class="models__enabled-model__label">{{element.label}}</span>
+								<span class="models__enabled-model__label">{{ element.label }}</span>
 								<button class="models__enabled-model__remove-button" @click="weatherModelStore.toggleModel(element.key)"><svg-icon type="mdi" :path="mdiTrashCan"></svg-icon></button>
 							</div>
 						</template>

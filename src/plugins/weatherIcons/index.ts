@@ -9,14 +9,20 @@ export const weatherIcons: Plugin = {
 	id: 'weatherIcons',
 
 	afterDraw(chart, args, options: WeatherIconsOptions) {
+		const scaleX = chart.scales.x
+		const firstHourlyForecast = options.forecast.hourly[0]
+		if (scaleX === undefined || firstHourlyForecast === undefined) {
+			return
+		}
+
 		const ctx = chart.ctx
 		const iconWidth = 30
-		const firstPixel = chart.scales.x.getPixelForValue(options.forecast.hourly[0].time.getTime())
+		const firstPixel = scaleX.getPixelForValue(firstHourlyForecast.time.getTime())
 		let lastPixelDraw: number | undefined = undefined
 
 		options.forecast.hourly.filter(({ time }) => {
 			const timestamp = time.getTime()
-			const pixel = chart.scales.x.getPixelForValue(timestamp)
+			const pixel = scaleX.getPixelForValue(timestamp)
 
 			// Prevent first icon to be partially drawn outside of the canvas.
 			if (pixel < firstPixel + iconWidth / 2) {
@@ -32,10 +38,10 @@ export const weatherIcons: Plugin = {
 			return true
 		}).forEach(({ time, weatherCode }, i) => {
 			const timestamp = time.getTime()
-			const pixel = chart.scales.x.getPixelForValue(timestamp)
+			const pixel = scaleX.getPixelForValue(timestamp)
 
 			// Don't draw icons that are outside of the canvas.
-			if (pixel < chart.scales.x.left - iconWidth || pixel > chart.scales.x.right + iconWidth) {
+			if (pixel < scaleX.left - iconWidth || pixel > scaleX.right + iconWidth) {
 				return
 			}
 
