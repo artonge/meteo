@@ -145,6 +145,10 @@ export async function searchLocation(query: string): Promise<City[]> {
 	const response = await fetch(searchRequest)
 	const { results } = await response.json()
 
+	if (results === undefined) {
+		return []
+	}
+
 	return results.map((city: any) => {
 		return {
 			id: Number.parseInt(city.id),
